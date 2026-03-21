@@ -1,0 +1,15 @@
+# 图片资源目录
+
+请将以下图片放入此目录：
+
+## Tab栏图标 (必需)
+- tab_book.png / tab_book_selected.png - 账本
+- tab_story.png / tab_story_selected.png - 财记  
+- tab_report.png / tab_report_selected.png - 统计
+- tab_me.png / tab_me_selected.png - 我的
+
+## 空状态图标 (可选)
+- empty_book.png - 账本空状态
+- empty_story.png - 财记空状态
+
+建议使用 48x48px 的 PNG 图片

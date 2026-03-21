@@ -1,0 +1,185 @@
+/* pages/book/book.wxss */
+
+.container {
+  padding-bottom: 40rpx;
+}
+
+/* 日期选择器 */
+.date-picker {
+  display: flex;
+  justify-content: center;
+  padding: 20rpx;
+}
+
+.date-display {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 40rpx;
+  background: var(--primary-light);
+  border-radius: 40rpx;
+}
+
+.date-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-right: 12rpx;
+}
+
+.arrow {
+  font-size: 24rpx;
+  color: var(--primary-color);
+}
+
+/* 月度统计 */
+.month-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 30rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.stat-value {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 支出列表 */
+.expense-list {
+  height: calc(100vh - 400rpx);
+}
+
+.day-group {
+  margin-bottom: 20rpx;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background: var(--bg-white);
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.day-date {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.day-total {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.day-expenses {
+  background: var(--bg-white);
+}
+
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.expense-item:last-child {
+  border-bottom: none;
+}
+
+.expense-item:active {
+  background: #f9f9f9;
+}
+
+.expense-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.expense-event {
+  font-size: 30rpx;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expense-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag-mini {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+  background: #f0f0f0;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  margin-right: 12rpx;
+}
+
+.expense-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 20rpx;
+}
+
+.expense-amount {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.expense-focus {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+  margin-top: 8rpx;
+}
+
+/* 浮动按钮 */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 180rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.3);
+  z-index: 100;
+}
+
+.fab-text {
+  font-size: 56rpx;
+  color: white;
+  font-weight: 300;
+}
+
+.fab:active {
+  opacity: 0.8;
+}
+
+/* 空状态 */
+.empty-state {
+  padding-top: 200rpx;
+}

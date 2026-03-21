@@ -1,0 +1,97 @@
+<!--pages/me/me.wxml-->
+<view class="container">
+  <!-- 用户信息 -->
+  <view class="user-card card">
+    <view class="user-avatar">
+      <open-data type="userAvatarUrl"></open-data>
+    </view>
+    <view class="user-info">
+      <open-data type="userNickName" class="user-name"></open-data>
+      <text class="user-id" wx:if="{{openid}}">ID: {{openid}}</text>
+    </view>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-card card">
+    <view class="stat-box">
+      <text class="stat-num">{{totalExpenses}}</text>
+      <text class="stat-desc">总记账</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-box">
+      <text class="stat-num">{{totalStories}}</text>
+      <text class="stat-desc">财记数</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-box">
+      <text class="stat-num">{{focusCount}}</text>
+      <text class="stat-desc">关注项</text>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="menu-list">
+    <!-- 关注管理 -->
+    <view class="menu-item card" bindtap="goToFocusManage">
+      <view class="menu-icon focus-icon">🏷️</view>
+      <view class="menu-content">
+        <text class="menu-title">关注管理</text>
+        <text class="menu-desc">管理你的支出分类标签</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <!-- 数据同步 -->
+    <view class="menu-item card" bindtap="syncData">
+      <view class="menu-icon sync-icon">☁️</view>
+      <view class="menu-content">
+        <text class="menu-title">数据同步</text>
+        <text class="menu-desc">同步数据到云端</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <!-- 关于 -->
+    <view class="menu-item card" bindtap="showAbout">
+      <view class="menu-icon about-icon">ℹ️</view>
+      <view class="menu-content">
+        <text class="menu-title">关于</text>
+        <text class="menu-desc">浣熊财记 v1.0.0</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 清空数据 -->
+  <view class="danger-zone card">
+    <view class="danger-title">危险操作</view>
+    <button class="btn-danger-plain" bindtap="clearAllData">清空所有数据</button>
+  </view>
+</view>
+
+<!-- 关注管理弹窗 -->
+<view class="modal {{showFocusModal ? 'modal-show' : ''}}" bindtap="hideFocusModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">关注管理</text>
+      <text class="modal-close" bindtap="hideFocusModal">×</text>
+    </view>
+    
+    <view class="focus-manage">
+      <view class="focus-add">
+        <input class="focus-input" placeholder="添加新关注" value="{{newFocus}}" bindinput="onNewFocusInput" bindconfirm="addFocus"/>
+        <button class="btn-add" bindtap="addFocus">添加</button>
+      </view>
+      
+      <view class="focus-list">
+        <view wx:for="{{focusList}}" wx:key="*this" class="focus-tag">
+          <text class="focus-tag-name">{{item}}</text>
+          <view class="focus-tag-actions">
+            <text class="focus-action" bindtap="editFocus" data-name="{{item}}">编辑</text>
+            <text class="focus-action delete" bindtap="deleteFocus" data-name="{{item}}">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,69 @@
+<!--pages/book/book.wxml-->
+<view class="container">
+  <!-- 日期选择器 -->
+  <view class="date-picker card">
+    <picker mode="date" fields="month" value="{{currentDate}}" end="{{today}}" bindchange="onDateChange">
+      <view class="date-display">
+        <text class="date-text">{{currentYear}}年{{currentMonth}}月</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 月度统计 -->
+  <view class="month-stats card">
+    <view class="stat-item">
+      <text class="stat-label">本月支出</text>
+      <text class="stat-value amount-large">¥{{monthStats.total}}</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-label">记账笔数</text>
+      <text class="stat-value">{{monthStats.count}}笔</text>
+    </view>
+  </view>
+
+  <!-- 支出列表 -->
+  <scroll-view scroll-y class="expense-list" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <block wx:if="{{groupedExpenses.length > 0}}">
+      <view wx:for="{{groupedExpenses}}" wx:key="date" class="day-group">
+        <!-- 日期标题 -->
+        <view class="day-header">
+          <text class="day-date">{{item.displayDate}}</text>
+          <text class="day-total">¥{{item.dayTotal}}</text>
+        </view>
+        
+        <!-- 当日支出列表 -->
+        <view class="day-expenses">
+          <view wx:for="{{item.expenses}}" wx:key="_id" wx:for-item="expense" 
+                class="expense-item" bindtap="onEditExpense" data-id="{{expense._id}}">
+            <view class="expense-info">
+              <text class="expense-event">{{expense.event}}</text>
+              <view class="expense-tags" wx:if="{{expense.tags.length > 0}}">
+                <text wx:for="{{expense.tags}}" wx:key="*this" wx:for-item="tag" class="tag-mini">{{tag}}</text>
+              </view>
+            </view>
+            <view class="expense-right">
+              <text class="expense-amount">¥{{expense.amount}}</text>
+              <text wx:if="{{expense.focus}}" class="expense-focus">{{expense.focus}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+    
+    <!-- 空状态 -->
+    <view wx:else class="empty-state">
+      <image class="empty-icon" src="/images/empty_book.png" mode="aspectFit"></image>
+      <view class="empty-text">
+        <text>这个月还没有记账呢
+</text>
+        <text>点击右下角 + 开始记账吧</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 浮动添加按钮 -->
+  <view class="fab" bindtap="onAddExpense">
+    <text class="fab-text">+</text>
+  </view>
+</view>

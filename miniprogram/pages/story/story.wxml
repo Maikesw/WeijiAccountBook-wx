@@ -1,0 +1,41 @@
+<!--pages/story/story.wxml-->
+<view class="container">
+  <scroll-view scroll-y class="story-list">
+    <block wx:if="{{stories.length > 0}}">
+      <view wx:for="{{stories}}" wx:key="_id" class="story-card" bindtap="onViewDetail" data-id="{{item._id}}">
+        <!-- 头部：日期和事件 -->
+        <view class="story-header">
+          <text class="story-date">{{item.displayDate}}</text>
+          <text class="story-event">{{item.event}}</text>
+        </view>
+        
+        <!-- 故事内容 -->
+        <view class="story-body">
+          <text class="story-text">{{item.story.text || '没有留下文字记录...'}}</text>
+        </view>
+        
+        <!-- 底部：Emoji、金额、评分 -->
+        <view class="story-footer">
+          <view class="story-meta">
+            <text wx:if="{{item.story.emoji}}" class="story-emoji">{{item.story.emoji}}</text>
+            <text class="story-amount">¥{{item.amount}}</text>
+          </view>
+          <view class="story-rating" wx:if="{{item.story.rating > 0}}">
+            <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this" 
+                  class="star {{item.story.rating >= item ? 'star-active' : ''}}">★</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    
+    <!-- 空状态 -->
+    <view wx:else class="empty-state">
+      <image class="empty-icon" src="/images/empty_story.png" mode="aspectFit"></image>
+      <view class="empty-text">
+        <text>还没有财记呢
+</text>
+        <text>给花销添加背后的故事吧！</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>

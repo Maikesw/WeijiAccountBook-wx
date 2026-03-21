@@ -1,0 +1,91 @@
+/* pages/story/story.wxss */
+
+.container {
+  padding: 20rpx;
+}
+
+.story-list {
+  height: 100vh;
+}
+
+.story-card {
+  background: var(--bg-white);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.story-card:active {
+  opacity: 0.8;
+}
+
+.story-header {
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.story-date {
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.story-event {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.story-body {
+  margin-bottom: 20rpx;
+}
+
+.story-text {
+  font-size: 30rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.story-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.story-meta {
+  display: flex;
+  align-items: center;
+}
+
+.story-emoji {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.story-amount {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.story-rating {
+  display: flex;
+}
+
+.star {
+  font-size: 32rpx;
+  color: #ddd;
+  margin-left: 8rpx;
+}
+
+.star-active {
+  color: #ffb800;
+}
+
+/* 空状态 */
+.empty-state {
+  padding-top: 200rpx;
+}

@@ -1,0 +1,122 @@
+<!--pages/report/report.wxml-->
+<view class="container">
+  <!-- 切换标签 -->
+  <view class="segment-control card">
+    <view class="segment-item {{currentTab === 'focus' ? 'segment-active' : ''}}" bindtap="switchTab" data-tab="focus">关注</view>
+    <view class="segment-item {{currentTab === 'report' ? 'segment-active' : ''}}" bindtap="switchTab" data-tab="report">简报</view>
+    <view class="segment-item {{currentTab === 'story' ? 'segment-active' : ''}}" bindtap="switchTab" data-tab="story">财记</view>
+  </view>
+
+  <!-- 月份选择 -->
+  <view class="month-selector">
+    <picker mode="date" fields="month" value="{{currentDate}}" end="{{today}}" bindchange="onDateChange">
+      <view class="month-display">
+        <text class="month-text">{{currentYear}}年{{currentMonth}}月</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 关注统计 -->
+  <view wx:if="{{currentTab === 'focus'}}" class="tab-content">
+    <view class="stat-overview card">
+      <view class="stat-item">
+        <text class="stat-value">¥{{monthStats.total}}</text>
+        <text class="stat-label">总支出</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{monthStats.count}}</text>
+        <text class="stat-label">笔数</text>
+      </view>
+    </view>
+
+    <!-- 饼图 -->
+    <view class="chart-card card">
+      <view class="card-title">支出分布</view>
+      <view wx:if="{{focusStats.length > 0}}" class="pie-chart-container">
+        <canvas type="2d" id="pieChart" class="pie-chart"></canvas>
+      </view>
+      <view wx:else class="empty-small">
+        <text>本月暂无数据</text>
+      </view>
+    </view>
+
+    <!-- 关注列表 -->
+    <view class="focus-stats card">
+      <view class="card-title">关注详情</view>
+      <view wx:for="{{focusStats}}" wx:key="name" class="focus-stat-item">
+        <view class="focus-stat-info">
+          <view class="focus-color" style="background: {{item.color}}"></view>
+          <text class="focus-name">{{item.name}}</text>
+        </view>
+        <view class="focus-stat-values">
+          <text class="focus-amount">¥{{item.amount}}</text>
+          <text class="focus-percent">{{item.percent}}%</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 简报统计 -->
+  <view wx:if="{{currentTab === 'report'}}" class="tab-content">
+    <view class="brief-report card">
+      <view class="report-header">
+        <text class="report-title">{{currentMonth}}月消费简报</text>
+        <text class="report-date">统计周期：{{currentYear}}-{{currentMonth}}</text>
+      </view>
+      
+      <view class="report-section">
+        <view class="report-item">
+          <text class="report-label">总支出</text>
+          <text class="report-value highlight">¥{{monthStats.total}}</text>
+        </view>
+        <view class="report-item">
+          <text class="report-label">记账笔数</text>
+          <text class="report-value">{{monthStats.count}} 笔</text>
+        </view>
+        <view class="report-item">
+          <text class="report-label">日均消费</text>
+          <text class="report-value">¥{{dailyAverage}}</text>
+        </view>
+        <view class="report-item">
+          <text class="report-label">单笔最高</text>
+          <text class="report-value">¥{{maxAmount}}</text>
+        </view>
+      </view>
+
+      <view class="report-section" wx:if="{{topFocus.name}}">
+        <view class="section-subtitle">最大支出项</view>
+        <view class="top-focus">
+          <text class="top-focus-name">{{topFocus.name}}</text>
+          <text class="top-focus-amount">¥{{topFocus.amount}} ({{topFocus.percent}}%)</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 财记时间线 -->
+  <view wx:if="{{currentTab === 'story'}}" class="tab-content">
+    <view class="story-timeline card">
+      <view class="card-title">财记时间线</view>
+      <view wx:if="{{storyTimeline.length > 0}}" class="timeline">
+        <view wx:for="{{storyTimeline}}" wx:key="_id" class="timeline-item">
+          <view class="timeline-dot"></view>
+          <view class="timeline-content">
+            <text class="timeline-date">{{item.displayDate}}</text>
+            <text class="timeline-event">{{item.event}}</text>
+            <view class="timeline-story" wx:if="{{item.story.text}}">
+              <text>{{item.story.text}}</text>
+            </view>
+            <view class="timeline-meta">
+              <text wx:if="{{item.story.emoji}}" class="timeline-emoji">{{item.story.emoji}}</text>
+              <text class="timeline-amount">¥{{item.amount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="empty-small">
+        <text>本月还没有添加财记</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,291 @@
+/* pages/expense/expense.wxss */
+
+.container {
+  padding-bottom: 60rpx;
+}
+
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 快速输入 */
+.quick-input {
+  width: 100%;
+  min-height: 120rpx;
+  font-size: 30rpx;
+  line-height: 1.6;
+  padding: 20rpx;
+  box-sizing: border-box;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+}
+
+.parse-hint {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  margin-top: 16rpx;
+  padding: 12rpx 16rpx;
+  background: var(--primary-light);
+  border-radius: 8rpx;
+}
+
+/* 表单样式 */
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  width: 120rpx;
+  font-size: 30rpx;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.picker-value {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text-primary);
+}
+
+.form-input {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text-primary);
+}
+
+.currency {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-left: 12rpx;
+}
+
+/* 标签 */
+.tag-input-wrap {
+  margin-bottom: 16rpx;
+}
+
+.tag-input {
+  font-size: 30rpx;
+  padding: 16rpx 20rpx;
+  background: #f9f9f9;
+  border-radius: 8rpx;
+}
+
+.tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  margin-right: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.tag-delete {
+  margin-left: 12rpx;
+  font-size: 28rpx;
+  opacity: 0.7;
+}
+
+.tag-suggested {
+  background: #f0f0f0;
+  color: var(--text-secondary);
+}
+
+.suggested-tags {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.suggested-title {
+  font-size: 26rpx;
+  color: var(--text-tertiary);
+  margin-bottom: 16rpx;
+}
+
+/* 关注 */
+.focus-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.focus-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 16rpx 32rpx;
+  background: #f5f5f5;
+  color: var(--text-secondary);
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx solid transparent;
+}
+
+.focus-active {
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* 财记故事 */
+.story-content {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.story-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-right: 20rpx;
+}
+
+.story-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.stars {
+  display: flex;
+}
+
+.star {
+  font-size: 44rpx;
+  color: #ddd;
+  margin-right: 12rpx;
+}
+
+.star-active {
+  color: #ffb800;
+}
+
+.story-emoji {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.emoji-display {
+  font-size: 40rpx;
+  padding: 16rpx 30rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+}
+
+.story-text {
+  width: 100%;
+  height: 160rpx;
+  font-size: 30rpx;
+  line-height: 1.6;
+  padding: 20rpx;
+  box-sizing: border-box;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+}
+
+/* 代付 */
+.forwho-content {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.forwho-input {
+  font-size: 30rpx;
+  padding: 16rpx 20rpx;
+  background: #f9f9f9;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.forwho-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.forwho-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  background: #fff3e0;
+  color: #ff9600;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  margin-right: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.forwho-delete {
+  margin-left: 12rpx;
+  font-size: 28rpx;
+  opacity: 0.7;
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 40rpx;
+}
+
+.btn-danger {
+  flex: 0 0 200rpx;
+  background: #fa5151;
+  color: white;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+}
+
+.btn-danger::after {
+  border: none;
+}
+
+.btn-primary {
+  flex: 1;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+}
+
+.btn-primary::after {
+  border: none;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+}

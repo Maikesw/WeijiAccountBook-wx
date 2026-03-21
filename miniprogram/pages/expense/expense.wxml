@@ -1,0 +1,142 @@
+<!--pages/expense/expense.wxml-->
+<view class="container">
+  <!-- 一句话输入 -->
+  <view class="section card">
+    <view class="section-title">快速记账</view>
+    <textarea class="quick-input" 
+              placeholder="用一句话记录你的花销，例如：今天午饭吃了碗面花了15块"
+              value="{{originalText}}"
+              bindinput="onOriginalTextInput"
+              bindblur="onOriginalTextBlur"
+              maxlength="200"
+              auto-height></textarea>
+    <view class="parse-hint" wx:if="{{parsedData.amount > 0}}">
+      已识别金额: ¥{{parsedData.amount}} | 事件: {{parsedData.event}}
+    </view>
+  </view>
+
+  <!-- 基础信息 -->
+  <view class="section card">
+    <view class="section-title">基础信息</view>
+    
+    <!-- 日期 -->
+    <view class="form-item">
+      <text class="form-label">日期</text>
+      <picker mode="date" value="{{spentAt}}" end="{{today}}" bindchange="onDateChange">
+        <view class="picker-value">{{spentAtDisplay}}</view>
+      </picker>
+    </view>
+    
+    <!-- 事件 -->
+    <view class="form-item">
+      <text class="form-label">事件</text>
+      <input class="form-input" placeholder="消费了什么？" value="{{event}}" bindinput="onEventInput"/>
+    </view>
+    
+    <!-- 金额 -->
+    <view class="form-item">
+      <text class="form-label">金额</text>
+      <input class="form-input" type="digit" placeholder="0.00" value="{{amount}}" bindinput="onAmountInput"/>
+      <text class="currency">元</text>
+    </view>
+  </view>
+
+  <!-- 标签 -->
+  <view class="section card">
+    <view class="section-title">标签</view>
+    <view class="tag-input-wrap">
+      <input class="tag-input" placeholder="添加标签，按回车确认" value="{{newTag}}" bindconfirm="onAddTag" bindinput="onTagInput"/>
+    </view>
+    <view class="tags-wrap" wx:if="{{tags.length > 0}}">
+      <view wx:for="{{tags}}" wx:key="*this" class="tag-item">
+        <text>{{item}}</text>
+        <text class="tag-delete" bindtap="onRemoveTag" data-tag="{{item}}">×</text>
+      </view>
+    </view>
+    
+    <!-- 智能推荐标签 -->
+    <view class="suggested-tags" wx:if="{{suggestedTags.length > 0}}">
+      <view class="suggested-title">推荐标签</view>
+      <view class="tags-wrap">
+        <view wx:for="{{suggestedTags}}" wx:key="*this" class="tag tag-suggested" bindtap="onAddSuggestedTag" data-tag="{{item}}">
+          + {{item}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关注 -->
+  <view class="section card">
+    <view class="section-title">关注分类</view>
+    <view class="focus-list">
+      <view wx:for="{{focusList}}" wx:key="*this" 
+            class="focus-item {{focus === item ? 'focus-active' : ''}}"
+            bindtap="onSelectFocus" data-focus="{{item}}">
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 财记故事 -->
+  <view class="section card">
+    <view class="section-header" bindtap="toggleStory">
+      <text class="section-title">财记故事</text>
+      <switch checked="{{showStory}}" bindchange="toggleStory"/>
+    </view>
+    
+    <view wx:if="{{showStory}}" class="story-content">
+      <!-- 评分 -->
+      <view class="story-rating">
+        <text class="story-label">评分</text>
+        <view class="stars">
+          <text wx:for="[1,2,3,4,5]" wx:key="*this" 
+                class="star {{story.rating >= item ? 'star-active' : ''}}"
+                bindtap="onRate" data-rate="{{item}}">★</text>
+        </view>
+      </view>
+      
+      <!-- Emoji -->
+      <view class="story-emoji">
+        <text class="story-label">心情</text>
+        <picker mode="selector" range="{{emojiList}}" bindchange="onEmojiChange">
+          <view class="emoji-display">{{story.emoji || '选择表情'}}</view>
+        </picker>
+      </view>
+      
+      <!-- 故事内容 -->
+      <textarea class="story-text" 
+                placeholder="记录这个故事..."
+                value="{{story.text}}"
+                bindinput="onStoryTextInput"
+                maxlength="500"></textarea>
+    </view>
+  </view>
+
+  <!-- 为谁代付 -->
+  <view class="section card">
+    <view class="section-header" bindtap="toggleForWho">
+      <text class="section-title">为谁代付</text>
+      <switch checked="{{showForWho}}" bindchange="toggleForWho"/>
+    </view>
+    
+    <view wx:if="{{showForWho}}" class="forwho-content">
+      <view class="forwho-input-wrap">
+        <input class="forwho-input" placeholder="添加代付对象" value="{{newForWho}}" bindconfirm="onAddForWho" bindinput="onForWhoInput"/>
+      </view>
+      <view class="forwho-list" wx:if="{{forWho.length > 0}}">
+        <view wx:for="{{forWho}}" wx:key="*this" class="forwho-item">
+          <text>{{item}}</text>
+          <text class="forwho-delete" bindtap="onRemoveForWho" data-name="{{item}}">×</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="actions">
+    <button wx:if="{{isEditMode}}" class="btn-danger" bindtap="onDelete">删除</button>
+    <button class="btn-primary {{!canSubmit ? 'btn-disabled' : ''}}" bindtap="onSubmit">
+      {{isEditMode ? '保存修改' : '记一笔'}}
+    </button>
+  </view>
+</view>

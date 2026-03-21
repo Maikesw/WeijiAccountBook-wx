@@ -24,74 +24,108 @@ class ExpenseService {
   // 根据ID获取支出
   getExpenseById(id) {
     const expenses = this.getLocalExpenses()
-    return expenses.find(item => item._id === id)
+    for (let i = 0; i < expenses.length; i++) {
+      if (expenses[i]._id === id) {
+        return expenses[i]
+      }
+    }
+    return null
   }
 
   // 获取某月支出
   getExpensesByMonth(year, month) {
     const expenses = this.getLocalExpenses()
-    return expenses.filter(item => {
-      const date = new Date(item.spentAt)
-      return date.getFullYear() === year && date.getMonth() + 1 === month
-    })
+    const result = []
+    for (let i = 0; i < expenses.length; i++) {
+      const date = new Date(expenses[i].spentAt)
+      if (date.getFullYear() === year && date.getMonth() + 1 === month) {
+        result.push(expenses[i])
+      }
+    }
+    return result
   }
 
   // 获取某天支出
   getExpensesByDate(dateStr) {
     const expenses = this.getLocalExpenses()
-    return expenses.filter(item => {
-      const itemDate = new Date(item.spentAt)
-      const targetDate = new Date(dateStr)
-      return itemDate.toDateString() === targetDate.toDateString()
-    })
+    const result = []
+    const targetDate = new Date(dateStr)
+    for (let i = 0; i < expenses.length; i++) {
+      const itemDate = new Date(expenses[i].spentAt)
+      if (itemDate.toDateString() === targetDate.toDateString()) {
+        result.push(expenses[i])
+      }
+    }
+    return result
   }
 
   // 创建支出
   createExpense(expenseData) {
-    return new Promise((resolve, reject) => {
-      const expenses = this.getLocalExpenses()
+    const that = this
+    return new Promise(function(resolve, reject) {
+      const expenses = that.getLocalExpenses()
       const newExpense = {
-        _id: this.generateId(),
-        ...expenseData,
+        _id: that.generateId(),
+        amount: expenseData.amount,
+        type: expenseData.type,
+        focus: expenseData.focus,
+        tags: expenseData.tags,
+        spentAt: expenseData.spentAt,
+        remark: expenseData.remark,
+        goal: expenseData.goal,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
       expenses.unshift(newExpense)
-      this.saveLocalExpenses(expenses)
+      that.saveLocalExpenses(expenses)
       resolve(newExpense)
     })
   }
 
   // 更新支出
   updateExpense(id, updateData) {
-    return new Promise((resolve, reject) => {
-      const expenses = this.getLocalExpenses()
-      const index = expenses.findIndex(item => item._id === id)
+    const that = this
+    return new Promise(function(resolve, reject) {
+      const expenses = that.getLocalExpenses()
+      let index = -1
+      for (let i = 0; i < expenses.length; i++) {
+        if (expenses[i]._id === id) {
+          index = i
+          break
+        }
+      }
       if (index === -1) {
         reject(new Error('未找到该支出记录'))
         return
       }
-      expenses[index] = {
-        ...expenses[index],
-        ...updateData,
-        updatedAt: new Date().toISOString()
+      // 合并更新数据
+      for (let key in updateData) {
+        expenses[index][key] = updateData[key]
       }
-      this.saveLocalExpenses(expenses)
+      expenses[index].updatedAt = new Date().toISOString()
+      that.saveLocalExpenses(expenses)
       resolve(expenses[index])
     })
   }
 
   // 删除支出
   deleteExpense(id) {
-    return new Promise((resolve, reject) => {
-      const expenses = this.getLocalExpenses()
-      const index = expenses.findIndex(item => item._id === id)
+    const that = this
+    return new Promise(function(resolve, reject) {
+      const expenses = that.getLocalExpenses()
+      let index = -1
+      for (let i = 0; i < expenses.length; i++) {
+        if (expenses[i]._id === id) {
+          index = i
+          break
+        }
+      }
       if (index === -1) {
         reject(new Error('未找到该支出记录'))
         return
       }
       expenses.splice(index, 1)
-      this.saveLocalExpenses(expenses)
+      that.saveLocalExpenses(expenses)
       resolve(true)
     })
   }
@@ -134,11 +168,11 @@ class ExpenseService {
       
       // 同步更新所有支出的focus字段
       const expenses = this.getLocalExpenses()
-      expenses.forEach(expense => {
-        if (expense.focus === oldName) {
-          expense.focus = newName
+      for (let i = 0; i < expenses.length; i++) {
+        if (expenses[i].focus === oldName) {
+          expenses[i].focus = newName
         }
-      })
+      }
       this.saveLocalExpenses(expenses)
     }
     return focusList
@@ -149,30 +183,40 @@ class ExpenseService {
   // 获取月度统计
   getMonthStats(year, month) {
     const expenses = this.getExpensesByMonth(year, month)
-    const total = expenses.reduce((sum, item) => sum + item.amount, 0)
+    let total = 0
+    for (let i = 0; i < expenses.length; i++) {
+      total += expenses[i].amount
+    }
     
     // 按focus分组
     const byFocus = {}
-    expenses.forEach(item => {
+    for (let i = 0; i < expenses.length; i++) {
+      const item = expenses[i]
       const focus = item.focus || '未分类'
       if (!byFocus[focus]) {
         byFocus[focus] = { amount: 0, count: 0 }
       }
       byFocus[focus].amount += item.amount
       byFocus[focus].count += 1
-    })
+    }
 
     return {
-      total,
+      total: total,
       count: expenses.length,
-      byFocus
+      byFocus: byFocus
     }
   }
 
   // 获取有财记的支出
   getExpensesWithStory() {
     const expenses = this.getLocalExpenses()
-    return expenses.filter(item => item.story && (item.story.text || item.story.emoji))
+    const result = []
+    for (let i = 0; i < expenses.length; i++) {
+      if (expenses[i].story && (expenses[i].story.text || expenses[i].story.emoji)) {
+        result.push(expenses[i])
+      }
+    }
+    return result
   }
 
   // ========== 云同步功能 ==========

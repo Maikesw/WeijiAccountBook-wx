@@ -1,27 +1,549 @@
-/**app.wxss**/
-.container {
+/** 理财日记 - 全局样式规范 **/
+
+/* ========== 设计系统变量 ========== */
+page {
+  /* 主色 - 商务蓝 */
+  --primary-600: #1677FF;
+  --primary-500: #4096FF;
+  --primary-400: #69B1FF;
+  --primary-100: #E6F4FF;
+  
+  /* 辅助色 - 成功绿 */
+  --success-600: #00B42A;
+  --success-500: #23C343;
+  --success-100: #E8FFEA;
+  
+  /* 辅助色 - 警示红 */
+  --error-600: #F53F3F;
+  --error-500: #FF6B6B;
+  --error-100: #FFECE8;
+  
+  /* 警示色 - 提醒橙 */
+  --warning-600: #FF7D00;
+  --warning-100: #FFF7E8;
+  
+  /* 中性色 - 灰阶 */
+  --neutral-900: #1D2129;
+  --neutral-700: #4E5969;
+  --neutral-500: #86909C;
+  --neutral-400: #A9AEB8;
+  --neutral-300: #C9CDD4;
+  --neutral-200: #E5E6EB;
+  --neutral-100: #F5F7FA;
+  --neutral-0: #FFFFFF;
+  
+  /* 投影 */
+  --shadow-sm: 0 2rpx 8rpx rgba(29, 33, 41, 0.08);
+  --shadow-md: 0 4rpx 16rpx rgba(29, 33, 41, 0.12);
+  --shadow-lg: 0 8rpx 24rpx rgba(29, 33, 41, 0.16);
+  
+  /* 间距系统 - 8rpx基准 */
+  --space-xs: 8rpx;
+  --space-sm: 16rpx;
+  --space-md: 24rpx;
+  --space-lg: 32rpx;
+  --space-xl: 48rpx;
+  
+  /* 圆角 */
+  --radius-sm: 8rpx;
+  --radius-md: 12rpx;
+  --radius-lg: 16rpx;
+  --radius-full: 9999rpx;
+  
+  /* 字体 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  
+  /* 页面背景 */
+  background-color: var(--neutral-100);
+  font-family: var(--font-family);
+  color: var(--neutral-900);
+  line-height: 1.6;
+}
+
+/* ========== 字体层级规范 ========== */
+/* H1 - 页面标题 */
+.text-h1 {
+  font-size: 40rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--neutral-900);
+}
+
+/* H2 - 卡片标题 */
+.text-h2 {
+  font-size: 36rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--neutral-900);
+}
+
+/* H3 - 区块标题 */
+.text-h3 {
+  font-size: 32rpx;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--neutral-900);
+}
+
+/* Body - 正文 */
+.text-body {
+  font-size: 28rpx;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--neutral-700);
+}
+
+/* Caption - 辅助文本 */
+.text-caption {
+  font-size: 24rpx;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--neutral-500);
+}
+
+/* Data - 数据文本 */
+.text-data {
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--neutral-900);
+}
+
+.text-data-lg {
+  font-size: 48rpx;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* 金额正向（收入） */
+.text-income {
+  color: var(--success-600);
+}
+
+/* 金额负向（支出） */
+.text-expense {
+  color: var(--error-600);
+}
+
+/* 老年友好模式 - 字体放大15% */
+.font-large .text-body {
+  font-size: 32rpx;
+}
+
+.font-large .text-caption {
+  font-size: 28rpx;
+}
+
+/* ========== 卡片组件 ========== */
+.card {
+  background: var(--neutral-0);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.card-header {
+  margin-bottom: var(--space-sm);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--neutral-900);
+}
+
+.card-subtitle {
+  font-size: 24rpx;
+  color: var(--neutral-500);
+  margin-top: var(--space-xs);
+}
+
+/* ========== 按钮组件 ========== */
+.btn {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  box-sizing: border-box;
-} 
-
-button {
-  background: initial;
+  justify-content: center;
+  height: 96rpx;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 32rpx;
+  font-weight: 500;
+  transition: all 200ms ease;
 }
 
-button:focus{
-  outline: 0;
-}
-
-button::after{
+.btn::after {
   border: none;
 }
 
+/* 主按钮 */
+.btn-primary {
+  background: var(--primary-600);
+  color: var(--neutral-0);
+  box-shadow: 0 4rpx 12rpx rgba(22, 119, 255, 0.3);
+}
 
-page {
-  background: #f6f6f6;
+.btn-primary:active {
+  transform: scale(0.98);
+  background: var(--primary-500);
+}
+
+.btn-primary[disabled] {
+  opacity: 0.5;
+}
+
+/* 次要按钮 */
+.btn-secondary {
+  background: var(--neutral-0);
+  color: var(--neutral-700);
+  border: 2rpx solid var(--neutral-200);
+}
+
+.btn-secondary:active {
+  background: var(--neutral-100);
+}
+
+/* 核心操作按钮 - 加大20% */
+.btn-core {
+  height: 112rpx;
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+/* 文字按钮 */
+.btn-text {
+  background: transparent;
+  color: var(--primary-600);
+  font-size: 28rpx;
+}
+
+/* 危险按钮 */
+.btn-danger {
+  background: var(--error-600);
+  color: var(--neutral-0);
+}
+
+/* ========== 输入框组件 ========== */
+.input {
+  height: 96rpx;
+  padding: 0 var(--space-sm);
+  background: var(--neutral-100);
+  border: 2rpx solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 32rpx;
+  color: var(--neutral-900);
+  transition: all 200ms ease;
+}
+
+.input:focus {
+  background: var(--neutral-0);
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 4rpx rgba(22, 119, 255, 0.1);
+}
+
+.input::placeholder {
+  color: var(--neutral-400);
+}
+
+.input-error {
+  background: var(--error-100);
+  border-color: var(--error-600);
+}
+
+/* 文本域 */
+.textarea {
+  padding: var(--space-sm);
+  background: var(--neutral-100);
+  border: 2rpx solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 30rpx;
+  line-height: 1.6;
+  min-height: 160rpx;
+}
+
+.textarea:focus {
+  background: var(--neutral-0);
+  border-color: var(--primary-600);
+}
+
+/* ========== 标签组件 ========== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  background: var(--primary-100);
+  color: var(--primary-600);
+  border-radius: var(--radius-full);
+  font-size: 26rpx;
+  font-weight: 500;
+  margin-right: var(--space-xs);
+  margin-bottom: var(--space-xs);
+}
+
+.tag-active {
+  background: var(--primary-600);
+  color: var(--neutral-0);
+}
+
+.tag-success {
+  background: var(--success-100);
+  color: var(--success-600);
+}
+
+.tag-error {
+  background: var(--error-100);
+  color: var(--error-600);
+}
+
+/* ========== 列表组件 ========== */
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  border-bottom: 2rpx solid var(--neutral-100);
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-sm);
+  font-size: 40rpx;
+}
+
+.list-content {
+  flex: 1;
+}
+
+.list-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--neutral-900);
+}
+
+.list-desc {
+  font-size: 24rpx;
+  color: var(--neutral-500);
+  margin-top: 4rpx;
+}
+
+.list-arrow {
+  font-size: 32rpx;
+  color: var(--neutral-400);
+}
+
+/* ========== 分割线与间距 ========== */
+.divider {
+  height: 2rpx;
+  background: var(--neutral-200);
+  margin: var(--space-sm) 0;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--neutral-700);
+  margin-bottom: var(--space-sm);
+  padding-left: var(--space-xs);
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-md);
+}
+
+.empty-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: var(--space-md);
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--neutral-700);
+  margin-bottom: var(--space-xs);
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: var(--neutral-500);
+  text-align: center;
+}
+
+/* ========== 浮动按钮 ========== */
+.fab {
+  position: fixed;
+  right: var(--space-md);
+  bottom: 180rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: var(--primary-600);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  transition: all 200ms ease;
+}
+
+.fab:active {
+  transform: scale(0.95);
+  background: var(--primary-500);
+}
+
+.fab-icon {
+  font-size: 56rpx;
+  color: var(--neutral-0);
+  font-weight: 300;
+}
+
+/* ========== 进度条 ========== */
+.progress-bar {
+  height: 16rpx;
+  background: var(--neutral-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 300ms ease;
+}
+
+.progress-fill.success {
+  background: var(--success-600);
+}
+
+.progress-fill.warning {
+  background: var(--warning-600);
+}
+
+.progress-fill.error {
+  background: var(--error-600);
+}
+
+/* ========== 网格布局 ========== */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.grid-item {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--neutral-0);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 200ms ease;
+}
+
+.grid-item:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-md);
+}
+
+.grid-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  margin-bottom: var(--space-xs);
+}
+
+.grid-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--neutral-700);
+}
+
+/* ========== Tab栏自定义样式 ========== */
+.tab-active {
+  color: var(--primary-600) !important;
+}
+
+/* ========== 工具类 ========== */
+.flex {
+  display: flex;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.ml-sm { margin-left: var(--space-sm); }
+.mr-sm { margin-right: var(--space-sm); }
+
+.p-sm { padding: var(--space-sm); }
+.p-md { padding: var(--space-md); }
+
+.rounded-full {
+  border-radius: var(--radius-full);
+}
+
+.bg-primary-light {
+  background: var(--primary-100);
+}
+
+.bg-success-light {
+  background: var(--success-100);
+}
+
+.bg-error-light {
+  background: var(--error-100);
+}
+
+/* 隐藏滚动条但保持滚动 */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

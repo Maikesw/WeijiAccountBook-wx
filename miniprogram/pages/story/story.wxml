@@ -29,13 +29,10 @@
     </block>
     
     <!-- 空状态 -->
-    <view wx:else class="empty-state">
-      <image class="empty-icon" src="/images/empty_story.png" mode="aspectFit"></image>
-      <view class="empty-text">
-        <text>还没有财记呢
-</text>
-        <text>给花销添加背后的故事吧！</text>
-      </view>
+    <view wx:else class="empty-state card">
+      <text class="empty-icon-text">📖</text>
+      <text class="empty-title">还没有财记呢</text>
+      <text class="empty-desc">给花销添加背后的故事吧！</text>
     </view>
   </scroll-view>
 </view>

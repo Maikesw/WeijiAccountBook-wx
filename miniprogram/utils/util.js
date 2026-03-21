@@ -38,20 +38,24 @@ function getDatesInMonth(year, month) {
 }
 
 // 防抖函数
-function debounce(fn, delay = 300) {
+function debounce(fn, delay) {
+  delay = delay || 300
   let timer = null
-  return function (...args) {
+  return function () {
+    const args = arguments
     if (timer) clearTimeout(timer)
-    timer = setTimeout(() => {
+    timer = setTimeout(function() {
       fn.apply(this, args)
     }, delay)
   }
 }
 
 // 节流函数
-function throttle(fn, interval = 300) {
+function throttle(fn, interval) {
+  interval = interval || 300
   let last = 0
-  return function (...args) {
+  return function () {
+    const args = arguments
     const now = Date.now()
     if (now - last >= interval) {
       last = now
@@ -84,11 +88,11 @@ function hideLoading() {
 
 // 确认对话框
 function showConfirm(title, content) {
-  return new Promise((resolve) => {
+  return new Promise(function(resolve) {
     wx.showModal({
-      title,
-      content,
-      success: (res) => {
+      title: title,
+      content: content,
+      success: function(res) {
         resolve(res.confirm)
       }
     })

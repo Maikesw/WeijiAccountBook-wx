@@ -1,88 +1,168 @@
-// pages/book/book.js
+// 账本页 - 优化版本
 const expenseService = require('../../services/expenseService')
-const { formatDate, formatAmount, showLoading, hideLoading } = require('../../utils/util')
+const { formatDate, formatAmount } = require('../../utils/util')
 
 Page({
   data: {
+    // 日期
     currentDate: '',
     currentYear: new Date().getFullYear(),
     currentMonth: new Date().getMonth() + 1,
     today: formatDate(new Date()),
-    groupedExpenses: [],
+    
+    // 统计数据
     monthStats: {
-      total: '0.0',
+      total: '0.00',
+      income: '0.00',
+      expense: '0.00',
       count: 0
     },
+    
+    // 预算数据
+    monthlyBudget: 5000,
+    budgetSpent: 0,
+    budgetRemaining: '0.00',
+    budgetPercent: 0,
+    
+    // 常用分类
+    quickCategories: [
+      { name: '餐饮', icon: '🍔', type: 'expense', bgColor: '#FFF7E8', color: '#FF7D00' },
+      { name: '交通', icon: '🚇', type: 'expense', bgColor: '#E6F4FF', color: '#1677FF' },
+      { name: '工资', icon: '💰', type: 'income', bgColor: '#E8FFEA', color: '#00B42A' },
+      { name: '购物', icon: '🛍️', type: 'expense', bgColor: '#FFECE8', color: '#F53F3F' },
+      { name: '娱乐', icon: '🎮', type: 'expense', bgColor: '#F0F5FF', color: '#165DFF' }
+    ],
+    
+    // 最近账单
+    recentExpenses: [],
+    
+    // 刷新状态
     refreshing: false
   },
 
   onLoad() {
     const now = new Date()
     this.setData({
-      currentDate: formatDate(now, 'YYYY-MM'),
-      currentYear: now.getFullYear(),
-      currentMonth: now.getMonth() + 1
+      currentDate: formatDate(now, 'YYYY-MM')
     })
-    this.loadExpenses()
+    this.loadData()
   },
 
   onShow() {
-    // 从其他页面返回时刷新数据
-    this.loadExpenses()
+    this.loadData()
   },
 
-  // 加载支出数据
-  loadExpenses() {
+  // 加载所有数据
+  loadData() {
+    this.loadMonthStats()
+    this.loadBudget()
+    this.loadRecentExpenses()
+  },
+
+  // 加载月度统计
+  loadMonthStats() {
     const { currentYear, currentMonth } = this.data
     const expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
     
-    // 按日期分组
-    const grouped = this.groupExpensesByDate(expenses)
+    let income = 0
+    let expense = 0
     
-    // 计算月度统计
-    const stats = this.calculateMonthStats(expenses)
+    for (let i = 0; i < expenses.length; i++) {
+      const item = expenses[i]
+      if (item.amount > 0) {
+        if (item.type === 'income' || item.focus === '收入') {
+          income += item.amount
+        } else {
+          expense += item.amount
+        }
+      }
+    }
+    
+    const total = income - expense
     
     this.setData({
-      groupedExpenses: grouped,
-      monthStats: stats
+      'monthStats.total': formatAmount(total),
+      'monthStats.income': formatAmount(income),
+      'monthStats.expense': formatAmount(expense),
+      'monthStats.count': expenses.length
     })
   },
 
-  // 按日期分组
-  groupExpensesByDate(expenses) {
-    const groups = {}
+  // 加载预算数据
+  loadBudget() {
+    // 从本地存储获取预算设置
+    const budget = wx.getStorageSync('monthlyBudget') || 5000
+    const { currentYear, currentMonth } = this.data
+    const expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
     
-    expenses.forEach(expense => {
-      const date = new Date(expense.spentAt)
-      const dateKey = formatDate(date, 'YYYY-MM-DD')
-      
-      if (!groups[dateKey]) {
-        groups[dateKey] = {
-          date: dateKey,
-          displayDate: this.formatDisplayDate(date),
-          expenses: [],
-          dayTotal: 0
-        }
+    let spent = 0
+    for (let i = 0; i < expenses.length; i++) {
+      if (expenses[i].amount > 0 && expenses[i].type !== 'income') {
+        spent += expenses[i].amount
       }
-      
-      groups[dateKey].expenses.push({
-        ...expense,
-        amount: formatAmount(expense.amount)
-      })
-      groups[dateKey].dayTotal += expense.amount
-    })
+    }
     
-    // 转换为数组并排序
-    return Object.values(groups)
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .map(group => ({
-        ...group,
-        dayTotal: formatAmount(group.dayTotal)
-      }))
+    const remaining = budget - spent
+    const percent = Math.min(100, Math.round((spent / budget) * 100))
+    
+    this.setData({
+      monthlyBudget: budget,
+      budgetSpent: spent,
+      budgetRemaining: formatAmount(remaining),
+      budgetPercent: percent
+    })
+  },
+
+  // 加载最近账单
+  loadRecentExpenses() {
+    const { currentYear, currentMonth } = this.data
+    const expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
+    
+    // 获取最近5条
+    const recent = []
+    const sliceData = expenses.slice(0, 5)
+    for (let i = 0; i < sliceData.length; i++) {
+      recent.push(this.formatExpenseItem(sliceData[i]))
+    }
+    
+    this.setData({
+      recentExpenses: recent
+    })
+  },
+
+  // 格式化账单项
+  formatExpenseItem(item) {
+    const categoryIcons = {
+      '餐饮': '🍔', '交通': '🚇', '房租': '🏠', '购物': '🛍️',
+      '娱乐': '🎮', '医疗': '💊', '教育': '📚', '工资': '💰',
+      '理财': '📈', '其他': '📦'
+    }
+    
+    const categoryColors = {
+      '餐饮': '#FFF7E8', '交通': '#E6F4FF', '房租': '#F0F5FF',
+      '购物': '#FFECE8', '娱乐': '#F5F0FF', '医疗': '#FFF0F0',
+      '教育': '#F0FFF0', '工资': '#E8FFEA', '理财': '#FFF7E8'
+    }
+    
+    const category = item.focus || (item.tags && item.tags[0]) || '其他'
+    
+    return {
+      _id: item._id,
+      event: item.event,
+      amount: formatAmount(item.amount),
+      displayDate: this.formatDisplayDate(item.spentAt),
+      category: category,
+      icon: categoryIcons[category] || '💰',
+      bgColor: categoryColors[category] || '#F5F7FA',
+      type: item.type || (item.amount > 0 && item.focus === '收入' ? 'income' : 'expense'),
+      spentAt: item.spentAt,
+      focus: item.focus
+    }
   },
 
   // 格式化显示日期
-  formatDisplayDate(date) {
+  formatDisplayDate(dateStr) {
+    const date = new Date(dateStr)
     const today = new Date()
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
@@ -92,16 +172,7 @@ Page({
     } else if (date.toDateString() === yesterday.toDateString()) {
       return '昨天'
     } else {
-      return formatDate(date, 'MM月DD日')
-    }
-  },
-
-  // 计算月度统计
-  calculateMonthStats(expenses) {
-    const total = expenses.reduce((sum, item) => sum + item.amount, 0)
-    return {
-      total: formatAmount(total),
-      count: expenses.length
+      return formatDate(date, 'MM-DD')
     }
   },
 
@@ -113,13 +184,13 @@ Page({
       currentYear: date.getFullYear(),
       currentMonth: date.getMonth() + 1
     })
-    this.loadExpenses()
+    this.loadData()
   },
 
   // 下拉刷新
   onRefresh() {
     this.setData({ refreshing: true })
-    this.loadExpenses()
+    this.loadData()
     setTimeout(() => {
       this.setData({ refreshing: false })
     }, 500)
@@ -127,7 +198,6 @@ Page({
 
   // 添加支出
   onAddExpense() {
-    // 清除编辑状态
     const app = getApp()
     app.globalData.isEditMode = false
     app.globalData.currentExpense = null
@@ -137,7 +207,23 @@ Page({
     })
   },
 
-  // 编辑支出
+  // 快捷分类记账
+  quickAddByCategory(e) {
+    const category = e.currentTarget.dataset.category
+    const app = getApp()
+    
+    app.globalData.isEditMode = false
+    app.globalData.currentExpense = {
+      focus: category.name,
+      type: category.type
+    }
+    
+    wx.navigateTo({
+      url: '/pages/expense/expense'
+    })
+  },
+
+  // 编辑账单
   onEditExpense(e) {
     const id = e.currentTarget.dataset.id
     const expense = expenseService.getExpenseById(id)
@@ -154,5 +240,26 @@ Page({
     wx.navigateTo({
       url: '/pages/expense/expense'
     })
+  },
+
+  // 查看全部账单
+  viewAllExpenses() {
+    // 可以展开更多或跳转到详情页
+    wx.showToast({ title: '功能开发中', icon: 'none' })
+  },
+
+  // 跳转到统计页
+  goToReport() {
+    wx.switchTab({ url: '/pages/report/report' })
+  },
+
+  // 跳转到预算管理
+  goToBudget() {
+    wx.showToast({ title: '预算管理开发中', icon: 'none' })
+  },
+
+  // 跳转到存钱目标
+  goToGoal() {
+    wx.showToast({ title: '存钱目标开发中', icon: 'none' })
   }
 })

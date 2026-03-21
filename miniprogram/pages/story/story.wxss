@@ -87,5 +87,31 @@
 
 /* 空状态 */
 .empty-state {
-  padding-top: 200rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 96rpx 48rpx;
+  margin-top: 32rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(29, 33, 41, 0.08);
+}
+
+.empty-icon-text {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #4E5969;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #86909C;
+  text-align: center;
 }

@@ -20,11 +20,18 @@ Page({
     const stories = expenseService.getExpensesWithStory()
     
     // 格式化数据
-    const formattedStories = stories.map(item => ({
-      ...item,
-      amount: formatAmount(item.amount),
-      displayDate: this.formatStoryDate(item.spentAt)
-    }))
+    const formattedStories = []
+    for (let i = 0; i < stories.length; i++) {
+      const item = stories[i]
+      formattedStories.push({
+        _id: item._id,
+        event: item.event,
+        amount: formatAmount(item.amount),
+        displayDate: this.formatStoryDate(item.spentAt),
+        story: item.story,
+        spentAt: item.spentAt
+      })
+    }
     
     this.setData({ stories: formattedStories })
   },

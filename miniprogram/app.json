@@ -1,16 +1,46 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/example/index"
+    "pages/book/book",
+    "pages/story/story",
+    "pages/report/report",
+    "pages/me/me",
+    "pages/expense/expense"
   ],
   "window": {
-    "backgroundColor": "#F6F6F6",
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#F6F6F6",
-    "navigationBarTitleText": "云开发 QuickStart",
-    "navigationBarTextStyle": "black"
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#1677FF",
+    "navigationBarTitleText": "理财日记",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F7FA"
+  },
+  "tabBar": {
+    "color": "#86909C",
+    "selectedColor": "#1677FF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/book/book",
+        "text": "账本"
+      },
+      {
+        "pagePath": "pages/story/story",
+        "text": "财记"
+      },
+      {
+        "pagePath": "pages/report/report",
+        "text": "统计"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的"
+      }
+    ]
   },
   "sitemapLocation": "sitemap.json",
-  "style": "v2",
-  "lazyCodeLoading": "requiredComponents"
+  "cloud": true,
+  "lazyCodeLoading": "requiredComponents",
+  "useExtendedLib": {
+    "weui": true
+  }
 }

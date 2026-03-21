@@ -1,122 +1,124 @@
-<!--pages/report/report.wxml-->
-<view class="container">
-  <!-- 切换标签 -->
-  <view class="segment-control card">
-    <view class="segment-item {{currentTab === 'focus' ? 'segment-active' : ''}}" bindtap="switchTab" data-tab="focus">关注</view>
-    <view class="segment-item {{currentTab === 'report' ? 'segment-active' : ''}}" bindtap="switchTab" data-tab="report">简报</view>
-    <view class="segment-item {{currentTab === 'story' ? 'segment-active' : ''}}" bindtap="switchTab" data-tab="story">财记</view>
-  </view>
-
-  <!-- 月份选择 -->
-  <view class="month-selector">
-    <picker mode="date" fields="month" value="{{currentDate}}" end="{{today}}" bindchange="onDateChange">
-      <view class="month-display">
-        <text class="month-text">{{currentYear}}年{{currentMonth}}月</text>
+<!-- 统计页 - 优化版本 -->
+<view class="page-container">
+  <!-- 时间筛选 -->
+  <view class="filter-bar card">
+    <view class="time-tabs">
+      <view wx:for="{{timeTabs}}" wx:key="value" 
+            class="time-tab {{currentTimeTab === item.value ? 'tab-active' : ''}}"
+            bindtap="switchTimeTab" data-tab="{{item.value}}">
+        {{item.label}}
+      </view>
+    </view>
+    <picker wx:if="{{currentTimeTab === 'custom'}}" mode="date" fields="month" 
+            value="{{currentDate}}" end="{{today}}" bindchange="onDateChange">
+      <view class="custom-date">
+        <text>{{currentYear}}-{{currentMonth}}</text>
         <text class="arrow">▼</text>
       </view>
     </picker>
   </view>
 
-  <!-- 关注统计 -->
-  <view wx:if="{{currentTab === 'focus'}}" class="tab-content">
-    <view class="stat-overview card">
-      <view class="stat-item">
-        <text class="stat-value">¥{{monthStats.total}}</text>
-        <text class="stat-label">总支出</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-value">{{monthStats.count}}</text>
-        <text class="stat-label">笔数</text>
-      </view>
+  <!-- 核心数据概览 -->
+  <view class="summary-cards">
+    <view class="summary-card income-card">
+      <text class="summary-label">总收入</text>
+      <text class="summary-value text-income">+{{stats.income}}</text>
     </view>
-
-    <!-- 饼图 -->
-    <view class="chart-card card">
-      <view class="card-title">支出分布</view>
-      <view wx:if="{{focusStats.length > 0}}" class="pie-chart-container">
-        <canvas type="2d" id="pieChart" class="pie-chart"></canvas>
-      </view>
-      <view wx:else class="empty-small">
-        <text>本月暂无数据</text>
-      </view>
+    <view class="summary-card expense-card">
+      <text class="summary-label">总支出</text>
+      <text class="summary-value text-expense">-{{stats.expense}}</text>
     </view>
-
-    <!-- 关注列表 -->
-    <view class="focus-stats card">
-      <view class="card-title">关注详情</view>
-      <view wx:for="{{focusStats}}" wx:key="name" class="focus-stat-item">
-        <view class="focus-stat-info">
-          <view class="focus-color" style="background: {{item.color}}"></view>
-          <text class="focus-name">{{item.name}}</text>
-        </view>
-        <view class="focus-stat-values">
-          <text class="focus-amount">¥{{item.amount}}</text>
-          <text class="focus-percent">{{item.percent}}%</text>
-        </view>
-      </view>
+    <view class="summary-card balance-card">
+      <text class="summary-label">结余</text>
+      <text class="summary-value {{stats.balance >= 0 ? 'text-income' : 'text-expense'}}">
+        {{stats.balance >= 0 ? '+' : ''}}{{stats.balance}}
+      </text>
     </view>
   </view>
 
-  <!-- 简报统计 -->
-  <view wx:if="{{currentTab === 'report'}}" class="tab-content">
-    <view class="brief-report card">
-      <view class="report-header">
-        <text class="report-title">{{currentMonth}}月消费简报</text>
-        <text class="report-date">统计周期：{{currentYear}}-{{currentMonth}}</text>
-      </view>
-      
-      <view class="report-section">
-        <view class="report-item">
-          <text class="report-label">总支出</text>
-          <text class="report-value highlight">¥{{monthStats.total}}</text>
+  <!-- 图表区 -->
+  <view class="chart-section card">
+    <view class="chart-header">
+      <text class="section-title">收支趋势</text>
+      <view class="chart-legend">
+        <view class="legend-item">
+          <view class="legend-dot" style="background: var(--success-600);"></view>
+          <text>收入</text>
         </view>
-        <view class="report-item">
-          <text class="report-label">记账笔数</text>
-          <text class="report-value">{{monthStats.count}} 笔</text>
-        </view>
-        <view class="report-item">
-          <text class="report-label">日均消费</text>
-          <text class="report-value">¥{{dailyAverage}}</text>
-        </view>
-        <view class="report-item">
-          <text class="report-label">单笔最高</text>
-          <text class="report-value">¥{{maxAmount}}</text>
-        </view>
-      </view>
-
-      <view class="report-section" wx:if="{{topFocus.name}}">
-        <view class="section-subtitle">最大支出项</view>
-        <view class="top-focus">
-          <text class="top-focus-name">{{topFocus.name}}</text>
-          <text class="top-focus-amount">¥{{topFocus.amount}} ({{topFocus.percent}}%)</text>
+        <view class="legend-item">
+          <view class="legend-dot" style="background: var(--error-600);"></view>
+          <text>支出</text>
         </view>
       </view>
     </view>
+    <view class="chart-container">
+      <canvas type="2d" id="trendChart" class="trend-chart"></canvas>
+    </view>
   </view>
 
-  <!-- 财记时间线 -->
-  <view wx:if="{{currentTab === 'story'}}" class="tab-content">
-    <view class="story-timeline card">
-      <view class="card-title">财记时间线</view>
-      <view wx:if="{{storyTimeline.length > 0}}" class="timeline">
-        <view wx:for="{{storyTimeline}}" wx:key="_id" class="timeline-item">
-          <view class="timeline-dot"></view>
-          <view class="timeline-content">
-            <text class="timeline-date">{{item.displayDate}}</text>
-            <text class="timeline-event">{{item.event}}</text>
-            <view class="timeline-story" wx:if="{{item.story.text}}">
-              <text>{{item.story.text}}</text>
-            </view>
-            <view class="timeline-meta">
-              <text wx:if="{{item.story.emoji}}" class="timeline-emoji">{{item.story.emoji}}</text>
-              <text class="timeline-amount">¥{{item.amount}}</text>
-            </view>
+  <!-- 占比饼图 -->
+  <view class="chart-section card">
+    <view class="chart-header">
+      <text class="section-title">支出占比</text>
+    </view>
+    <view class="pie-chart-container">
+      <canvas type="2d" id="pieChart" class="pie-chart"></canvas>
+      <view class="pie-legend" wx:if="{{categoryStats.length > 0}}">
+        <view wx:for="{{categoryStats}}" wx:key="name" class="pie-legend-item">
+          <view class="legend-color" style="background: {{item.color}};"></view>
+          <view class="legend-info">
+            <text class="legend-name">{{item.name}}</text>
+            <text class="legend-percent">{{item.percent}}%</text>
           </view>
+          <text class="legend-amount">{{item.amount}}</text>
         </view>
-      </view>
-      <view wx:else class="empty-small">
-        <text>本月还没有添加财记</text>
       </view>
     </view>
   </view>
+
+  <!-- 账单明细 -->
+  <view class="detail-section card">
+    <view class="detail-header">
+      <text class="section-title">账单明细</text>
+      <text class="detail-count">共{{detailList.length}}笔</text>
+    </view>
+    
+    <view class="detail-list">
+      <view wx:for="{{detailList}}" wx:key="_id" class="detail-item" bindtap="viewDetail" data-id="{{item._id}}">
+        <view class="detail-icon" style="background: {{item.bgColor}};">
+          <text>{{item.icon}}</text>
+        </view>
+        <view class="detail-info">
+          <text class="detail-name">{{item.event || item.category}}</text>
+          <text class="detail-date">{{item.displayDate}}</text>
+        </view>
+        <view class="detail-amount">
+          <text class="amount-value {{item.type === 'income' ? 'text-income' : 'text-expense'}}">
+            {{item.type === 'income' ? '+' : '-'}}{{item.amount}}
+          </text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore}}" bindtap="loadMore">
+      <text>加载更多</text>
+    </view>
+    <view class="no-more" wx:if="{{!hasMore && detailList.length > 0}}">
+      <text>已加载全部</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{detailList.length === 0 && !loading}}" class="empty-state card">
+    <text class="empty-icon-text">📊</text>
+    <text class="empty-title">暂无账单数据</text>
+    <text class="empty-desc">该时间段内没有收支记录</text>
+    <button class="btn btn-primary" style="margin-top: 32rpx; width: 300rpx;" bindtap="goAdd">
+      记一笔
+    </button>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view style="height: 40rpx;"></view>
 </view>

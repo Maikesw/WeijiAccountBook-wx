@@ -1,163 +1,278 @@
-// pages/me/me.js
+// 个人中心 - 优化版本
 const expenseService = require('../../services/expenseService')
-const { showToast, showConfirm, showLoading, hideLoading } = require('../../utils/util')
+const { showToast, formatAmount } = require('../../utils/util')
 
 Page({
   data: {
-    openid: '',
-    totalExpenses: 0,
-    totalStories: 0,
-    focusCount: 0,
+    // 用户信息
+    userInfo: {},
     
-    // 关注管理弹窗
-    showFocusModal: false,
-    focusList: [],
-    newFocus: ''
+    // 用户统计
+    userStats: {
+      totalDays: 0,
+      totalRecords: 0,
+      totalStories: 0
+    },
+    
+    // 设置
+    darkMode: false,
+    fontSize: 'normal',
+    fontSizeLabel: '标准',
+    cacheSize: '0KB',
+    
+    // 字体选项
+    showFontModal: false,
+    fontOptions: [
+      { value: 'small', label: '小', previewSize: 28 },
+      { value: 'normal', label: '标准', previewSize: 32 },
+      { value: 'large', label: '大', previewSize: 38 },
+      { value: 'xlarge', label: '超大', previewSize: 44 }
+    ]
   },
 
   onLoad() {
+    this.loadUserInfo()
     this.loadUserStats()
-    this.loadFocusList()
+    this.loadSettings()
+    this.calculateCache()
   },
 
   onShow() {
     this.loadUserStats()
   },
 
+  // 加载用户信息
+  loadUserInfo() {
+    const userInfo = wx.getStorageSync('userInfo') || {}
+    this.setData({ userInfo })
+  },
+
   // 加载用户统计
   loadUserStats() {
     const expenses = expenseService.getLocalExpenses()
     const stories = expenseService.getExpensesWithStory()
-    const focusList = expenseService.getFocusList()
+    
+    // 计算记账天数
+    const dates = {}
+    for (let i = 0; i < expenses.length; i++) {
+      const date = new Date(expenses[i].createdAt || expenses[i].spentAt).toDateString()
+      dates[date] = true
+    }
+    
+    // 计算对象keys数量
+    let daysCount = 0
+    for (let key in dates) {
+      if (dates.hasOwnProperty(key)) {
+        daysCount++
+      }
+    }
     
     this.setData({
-      totalExpenses: expenses.length,
-      totalStories: stories.length,
-      focusCount: focusList.length
+      'userStats.totalDays': daysCount,
+      'userStats.totalRecords': expenses.length,
+      'userStats.totalStories': stories.length
     })
   },
 
-  // 加载关注列表
-  loadFocusList() {
-    const focusList = expenseService.getFocusList()
-    this.setData({ focusList })
+  // 加载设置
+  loadSettings() {
+    const settings = wx.getStorageSync('appSettings') || {}
+    this.setData({
+      darkMode: settings.darkMode || false,
+      fontSize: settings.fontSize || 'normal'
+    })
+    this.updateFontLabel()
   },
 
-  // ========== 菜单功能 ==========
-
-  // 关注管理
-  goToFocusManage() {
-    this.setData({ showFocusModal: true })
+  // 更新字体标签
+  updateFontLabel() {
+    let label = '标准'
+    for (let i = 0; i < this.data.fontOptions.length; i++) {
+      if (this.data.fontOptions[i].value === this.data.fontSize) {
+        label = this.data.fontOptions[i].label
+        break
+      }
+    }
+    this.setData({
+      fontSizeLabel: label
+    })
   },
 
-  // 数据同步
-  async syncData() {
+  // 计算缓存大小
+  calculateCache() {
     try {
-      showLoading('正在同步...')
-      await expenseService.syncToCloud()
-      hideLoading()
-      showToast('同步成功', 'success')
-    } catch (err) {
-      hideLoading()
-      showToast('同步失败: ' + err.message)
+      const info = wx.getStorageInfoSync()
+      const size = info.currentSize
+      let sizeStr = ''
+      if (size < 1024) {
+        sizeStr = size + 'KB'
+      } else {
+        sizeStr = (size / 1024).toFixed(1) + 'MB'
+      }
+      this.setData({ cacheSize: sizeStr })
+    } catch (e) {
+      this.setData({ cacheSize: '0KB' })
     }
   },
 
-  // 关于
+  // 切换深色模式
+  toggleDarkMode(e) {
+    const darkMode = e.detail.value
+    this.setData({ darkMode })
+    
+    const settings = wx.getStorageSync('appSettings') || {}
+    settings.darkMode = darkMode
+    wx.setStorageSync('appSettings', settings)
+    
+    showToast(darkMode ? '已开启深色模式' : '已关闭深色模式')
+  },
+
+  // 显示字体选择
+  adjustFontSize() {
+    this.setData({ showFontModal: true })
+  },
+
+  // 隐藏字体选择
+  hideFontModal() {
+    this.setData({ showFontModal: false })
+  },
+
+  stopPropagation() {},
+
+  // 设置字体大小
+  setFontSize(e) {
+    const size = e.currentTarget.dataset.size
+    this.setData({ fontSize: size })
+    this.updateFontLabel()
+    
+    const settings = wx.getStorageSync('appSettings') || {}
+    settings.fontSize = size
+    wx.setStorageSync('appSettings', settings)
+    
+    // 应用到页面
+    this.applyFontSize(size)
+    
+    this.hideFontModal()
+    showToast('字体大小已调整')
+  },
+
+  // 应用字体大小
+  applyFontSize(size) {
+    const scaleMap = {
+      small: 0.9,
+      normal: 1,
+      large: 1.15,
+      xlarge: 1.3
+    }
+    
+    // 通过设置页面根字体大小来实现
+    // 实际项目中可以通过 CSS 变量或 class 切换实现
+  },
+
+  // 清理缓存
+  clearCache() {
+    wx.showModal({
+      title: '清理缓存',
+      content: '清理后需要重新登录，确定继续吗？',
+      success: function(res) {
+        if (res.confirm) {
+          wx.clearStorage()
+          showToast('缓存已清理')
+          setTimeout(function() {
+            wx.reLaunch({ url: '/pages/book/book' })
+          }, 1000)
+        }
+      }
+    })
+  },
+
+  // 清空所有数据
+  clearAllData() {
+    const that = this
+    wx.showModal({
+      title: '危险操作',
+      content: '此操作将删除所有账单数据，且无法恢复！确定继续吗？',
+      confirmColor: '#F53F3F',
+      success: function(res) {
+        if (res.confirm) {
+          wx.showModal({
+            title: '再次确认',
+            content: '数据删除后无法找回，请谨慎操作',
+            confirmColor: '#F53F3F',
+            success: function(res2) {
+              if (res2.confirm) {
+                expenseService.clearAll()
+                showToast('数据已清空')
+                that.loadUserStats()
+              }
+            }
+          })
+        }
+      }
+    })
+  },
+
+  // 导航功能
+  goToSecurity() {
+    showToast('安全中心开发中')
+  },
+
+  goToGoals() {
+    showToast('存钱目标开发中')
+  },
+
+  goToBudget() {
+    showToast('预算设置开发中')
+  },
+
+  goToCategories() {
+    showToast('分类管理开发中')
+  },
+
+  backupData() {
+    wx.showActionSheet({
+      itemList: ['导出为Excel', '导出为图片', '同步到云端'],
+      success: function(res) {
+        const actions = ['导出Excel开发中', '导出图片开发中', '同步开发中']
+        showToast(actions[res.tapIndex])
+      }
+    })
+  },
+
+  goToNotification() {
+    showToast('通知设置开发中')
+  },
+
+  showHelp() {
+    wx.navigateTo({ url: '/pages/help/help' })
+  },
+
+  feedback() {
+    wx.showModal({
+      title: '意见反馈',
+      editable: true,
+      placeholderText: '请输入您的意见或建议...',
+      success: function(res) {
+        if (res.confirm && res.content) {
+          showToast('感谢您的反馈')
+        }
+      }
+    })
+  },
+
   showAbout() {
     wx.showModal({
-      title: '关于浣熊财记',
- content: '浣熊财记是一款专为大学生和年轻人设计的记账应用。
-
-功能特点：
-• 快速记账，一句话记录
-• 智能标签，自动分类
-• 财记故事，记录生活
-• 数据统计，清晰明了
-
-© 2024 Racoon Account Book',
+      title: '关于理财日记',
+      content: '理财日记 v1.0.0\n\n一款简洁高效的记账工具\n帮助您轻松管理日常收支\n\n© 2024 理财日记',
       showCancel: false
     })
   },
 
-  // 清空数据
-  async clearAllData() {
-    const confirmed = await showConfirm('确认清空', '此操作将删除所有本地数据，且无法恢复！')
-    if (!confirmed) return
-
-    expenseService.clearAll()
-    showToast('数据已清空', 'success')
-    this.loadUserStats()
+  showPrivacy() {
+    wx.navigateTo({ url: '/pages/privacy/privacy' })
   },
 
-  // ========== 关注管理弹窗 ==========
-
-  hideFocusModal() {
-    this.setData({ showFocusModal: false })
-  },
-
-  stopPropagation() {
-    // 阻止冒泡
-  },
-
-  onNewFocusInput(e) {
-    this.setData({ newFocus: e.detail.value })
-  },
-
-  addFocus() {
-    const name = this.data.newFocus.trim()
-    if (!name) {
-      showToast('请输入关注名称')
-      return
-    }
-
-    if (this.data.focusList.includes(name)) {
-      showToast('该关注已存在')
-      return
-    }
-
-    expenseService.addFocus(name)
-    this.setData({
-      focusList: expenseService.getFocusList(),
-      newFocus: ''
-    })
-    this.loadUserStats()
-    showToast('添加成功')
-  },
-
-  editFocus(e) {
-    const oldName = e.currentTarget.dataset.name
-    wx.showModal({
-      title: '编辑关注',
-      editable: true,
-      placeholderText: oldName,
-      success: (res) => {
-        if (res.confirm && res.content) {
-          expenseService.updateFocus(oldName, res.content)
-          this.setData({
-            focusList: expenseService.getFocusList()
-          })
-          showToast('修改成功')
-        }
-      }
-    })
-  },
-
-  deleteFocus(e) {
-    const name = e.currentTarget.dataset.name
-    wx.showModal({
-      title: '确认删除',
-      content: `确定删除关注"${name}"吗？`,
-      success: (res) => {
-        if (res.confirm) {
-          expenseService.removeFocus(name)
-          this.setData({
-            focusList: expenseService.getFocusList()
-          })
-          this.loadUserStats()
-          showToast('删除成功')
-        }
-      }
-    })
+  showAgreement() {
+    wx.navigateTo({ url: '/pages/agreement/agreement' })
   }
 })

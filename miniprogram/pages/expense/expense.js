@@ -1,338 +1,241 @@
-// pages/expense/expense.js
+// 记账页 - 优化版本
 const expenseService = require('../../services/expenseService')
-const textParser = require('../../utils/textParser')
-const { formatDate, formatAmount, showToast, showConfirm } = require('../../utils/util')
+const { formatDate, formatAmount, showToast } = require('../../utils/util')
 
 Page({
   data: {
-    // 基础数据
+    // 模式
     isEditMode: false,
     expenseId: null,
     
-    // 原始文本输入
-    originalText: '',
-    parsedData: {
-      amount: 0,
-      event: ''
-    },
+    // 类型
+    type: 'expense', // expense, income
     
-    // 基础信息
+    // 金额
+    amount: '',
+    quickAmounts: ['10', '20', '50', '100', '200', '500'],
+    
+    // 分类
+    selectedCategory: '',
+    categories: [],
+    
+    // 日期
     spentAt: formatDate(new Date()),
     spentAtDisplay: '',
     today: formatDate(new Date()),
-    event: '',
-    amount: '',
     
-    // 标签
-    tags: [],
-    newTag: '',
-    suggestedTags: [],
+    // 备注
+    remark: '',
     
-    // 关注
-    focusList: [],
-    focus: '',
-    
-    // 财记
-    showStory: false,
-    story: {
-      rating: 0,
-      emoji: '',
-      text: ''
-    },
-    emojiList: ['😀', '😊', '😐', '😔', '😭', '😡', '😱', '🥰', '😎', '🤔', '👍', '👎', '🎉', '💰', '🍔', '🚗', '🎮', '📚', '💊', '🏠'],
-    
-    // 代付
-    showForWho: false,
-    forWho: [],
-    newForWho: ''
+    // 存钱目标
+    linkGoal: false,
+    selectedGoal: '',
+    savingsGoals: []
   },
 
   onLoad() {
+    this.initCategories()
+    this.initSavingsGoals()
+    this.updateDateDisplay()
+    
+    // 检查编辑模式
     const app = getApp()
-    const isEditMode = app.globalData.isEditMode
-    const expense = app.globalData.currentExpense
-    
-    // 加载关注列表
-    const focusList = expenseService.getFocusList()
-    
-    this.setData({
-      focusList,
-      spentAtDisplay: this.formatDisplayDate(new Date())
-    })
-    
-    if (isEditMode && expense) {
-      // 编辑模式：填充现有数据
-      this.fillEditData(expense)
+    if (app.globalData.isEditMode && app.globalData.currentExpense) {
+      this.fillEditData(app.globalData.currentExpense)
     }
   },
 
-  // 填充编辑数据
-  fillEditData(expense) {
-    const spentAt = formatDate(expense.spentAt, 'YYYY-MM-DD')
+  // 初始化分类
+  initCategories() {
+    const expenseCategories = [
+      { name: '餐饮', icon: '🍔', bgColor: '#FFF7E8', color: '#FF7D00' },
+      { name: '交通', icon: '🚇', bgColor: '#E6F4FF', color: '#1677FF' },
+      { name: '购物', icon: '🛍️', bgColor: '#FFECE8', color: '#F53F3F' },
+      { name: '娱乐', icon: '🎮', bgColor: '#F5F0FF', color: '#722ED1' },
+      { name: '居住', icon: '🏠', bgColor: '#F0F5FF', color: '#165DFF' },
+      { name: '医疗', icon: '💊', bgColor: '#FFF0F0', color: '#F53F3F' },
+      { name: '教育', icon: '📚', bgColor: '#F0FFF0', color: '#00B42A' },
+      { name: '其他', icon: '📦', bgColor: '#F5F7FA', color: '#86909C' }
+    ]
+    
+    const incomeCategories = [
+      { name: '工资', icon: '💰', bgColor: '#E8FFEA', color: '#00B42A' },
+      { name: '奖金', icon: '🎁', bgColor: '#FFF7E8', color: '#FF7D00' },
+      { name: '投资', icon: '📈', bgColor: '#E6F4FF', color: '#1677FF' },
+      { name: '兼职', icon: '💻', bgColor: '#F0F5FF', color: '#165DFF' },
+      { name: '红包', icon: '🧧', bgColor: '#FFECE8', color: '#F53F3F' },
+      { name: '其他', icon: '📦', bgColor: '#F5F7FA', color: '#86909C' }
+    ]
     
     this.setData({
-      isEditMode: true,
-      expenseId: expense._id,
-      originalText: expense.originalText || '',
-      spentAt: spentAt,
-      spentAtDisplay: this.formatDisplayDate(new Date(expense.spentAt)),
-      event: expense.event || '',
-      amount: expense.amount ? formatAmount(expense.amount) : '',
-      tags: expense.tags || [],
-      suggestedTags: expense.generatedTags || [],
-      focus: expense.focus || '',
-      showStory: !!expense.story,
-      story: expense.story || { rating: 0, emoji: '', text: '' },
-      showForWho: (expense.forWho && expense.forWho.length > 0),
-      forWho: expense.forWho || []
+      categories: this.data.type === 'income' ? incomeCategories : expenseCategories
     })
   },
 
-  // 格式化显示日期
-  formatDisplayDate(date) {
+  // 初始化存钱目标
+  initSavingsGoals() {
+    const goals = wx.getStorageSync('savingsGoals') || [
+      { name: '旅行基金', target: 10000, current: 4500, progress: 45 },
+      { name: '新手机', target: 8000, current: 1600, progress: 20 }
+    ]
+    this.setData({ savingsGoals: goals })
+  },
+
+  // 更新日期显示
+  updateDateDisplay() {
+    const date = new Date(this.data.spentAt)
     const today = new Date()
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
     
+    let display = ''
     if (date.toDateString() === today.toDateString()) {
-      return '今天'
+      display = '今天'
     } else if (date.toDateString() === yesterday.toDateString()) {
-      return '昨天'
+      display = '昨天'
     } else {
-      return formatDate(date, 'YYYY年MM月DD日')
+      display = formatDate(date, 'YYYY年MM月DD日')
     }
+    
+    this.setData({ spentAtDisplay: display })
   },
 
-  // ========== 原始文本解析 ==========
-  onOriginalTextInput(e) {
-    this.setData({
-      originalText: e.detail.value
-    })
-  },
-
-  onOriginalTextBlur(e) {
-    const text = e.detail.value
-    if (!text) return
+  // 填充编辑数据
+  fillEditData(expense) {
+    const spentAt = formatDate(expense.spentAt || new Date(), 'YYYY-MM-DD')
     
-    const parsed = textParser.parseOriginalText(text)
-    
-    // 更新解析结果
     this.setData({
-      parsedData: {
-        amount: parsed.amount,
-        event: parsed.event
-      },
-      // 自动填充基础信息（如果为空）
-      event: this.data.event || parsed.event,
-      amount: this.data.amount || (parsed.amount > 0 ? formatAmount(parsed.amount) : ''),
-      suggestedTags: parsed.generatedTags,
-      spentAt: formatDate(parsed.spentAt, 'YYYY-MM-DD')
+      isEditMode: true,
+      expenseId: expense._id,
+      type: expense.type || 'expense',
+      amount: expense.amount ? formatAmount(expense.amount) : '',
+      selectedCategory: expense.focus || expense.tags[0] || '',
+      spentAt: spentAt,
+      remark: expense.remark || expense.story?.text || '',
+      linkGoal: !!expense.goal,
+      selectedGoal: expense.goal || ''
     })
     
-    this.updateSpentAtDisplay()
+    // 根据类型更新分类
+    this.initCategories()
+    this.updateDateDisplay()
   },
 
-  // ========== 基础信息 ==========
-  onDateChange(e) {
-    this.setData({
-      spentAt: e.detail.value
-    })
-    this.updateSpentAtDisplay()
-  },
-
-  updateSpentAtDisplay() {
-    this.setData({
-      spentAtDisplay: this.formatDisplayDate(new Date(this.data.spentAt))
-    })
-  },
-
-  onEventInput(e) {
-    this.setData({ event: e.detail.value })
-  },
-
+  // 金额输入
   onAmountInput(e) {
-    this.setData({ amount: e.detail.value })
-  },
-
-  // ========== 标签管理 ==========
-  onTagInput(e) {
-    this.setData({ newTag: e.detail.value })
-  },
-
-  onAddTag(e) {
-    const tag = e.detail.value.trim()
-    if (!tag) return
-    
-    if (this.data.tags.includes(tag)) {
-      showToast('标签已存在')
-      return
+    let value = e.detail.value
+    // 限制两位小数
+    if (value.indexOf('.') > -1) {
+      const parts = value.split('.')
+      if (parts[1] && parts[1].length > 2) {
+        value = parts[0] + '.' + parts[1].slice(0, 2)
+      }
     }
-    
-    this.setData({
-      tags: [...this.data.tags, tag],
-      newTag: ''
+    this.setData({ amount: value })
+  },
+
+  // 快捷金额
+  setQuickAmount(e) {
+    this.setData({ amount: e.currentTarget.dataset.amount })
+  },
+
+  // 切换类型
+  switchType(e) {
+    const type = e.currentTarget.dataset.type
+    this.setData({ 
+      type: type,
+      selectedCategory: '' // 清空分类选择
+    })
+    this.initCategories()
+  },
+
+  // 选择分类
+  selectCategory(e) {
+    const category = e.currentTarget.dataset.category
+    this.setData({ selectedCategory: category.name })
+  },
+
+  // 日期选择
+  onDateChange(e) {
+    this.setData({ spentAt: e.detail.value })
+    this.updateDateDisplay()
+  },
+
+  // 备注输入
+  onRemarkInput(e) {
+    this.setData({ remark: e.detail.value })
+  },
+
+  // 切换关联目标
+  toggleLinkGoal(e) {
+    this.setData({ 
+      linkGoal: e.detail.value,
+      selectedGoal: e.detail.value ? this.data.selectedGoal : ''
     })
   },
 
-  onRemoveTag(e) {
-    const tag = e.currentTarget.dataset.tag
-    const tags = this.data.tags.filter(t => t !== tag)
-    this.setData({ tags })
+  // 选择目标
+  selectGoal(e) {
+    const goal = e.currentTarget.dataset.goal
+    this.setData({ selectedGoal: goal.name })
   },
 
-  onAddSuggestedTag(e) {
-    const tag = e.currentTarget.dataset.tag
-    if (this.data.tags.includes(tag)) return
-    
-    this.setData({
-      tags: [...this.data.tags, tag]
-    })
-  },
-
-  // ========== 关注管理 ==========
-  onSelectFocus(e) {
-    const focus = e.currentTarget.dataset.focus
-    this.setData({
-      focus: this.data.focus === focus ? '' : focus
-    })
-  },
-
-  // ========== 财记故事 ==========
-  toggleStory(e) {
-    this.setData({
-      showStory: e.detail.value
-    })
-  },
-
-  onRate(e) {
-    const rate = e.currentTarget.dataset.rate
-    this.setData({
-      'story.rating': rate
-    })
-  },
-
-  onEmojiChange(e) {
-    const index = e.detail.value
-    this.setData({
-      'story.emoji': this.data.emojiList[index]
-    })
-  },
-
-  onStoryTextInput(e) {
-    this.setData({
-      'story.text': e.detail.value
-    })
-  },
-
-  // ========== 代付管理 ==========
-  toggleForWho(e) {
-    this.setData({
-      showForWho: e.detail.value
-    })
-  },
-
-  onForWhoInput(e) {
-    this.setData({ newForWho: e.detail.value })
-  },
-
-  onAddForWho(e) {
-    const name = e.detail.value.trim()
-    if (!name) return
-    
-    if (this.data.forWho.includes(name)) {
-      showToast('已添加该对象')
-      return
-    }
-    
-    this.setData({
-      forWho: [...this.data.forWho, name],
-      newForWho: ''
-    })
-  },
-
-  onRemoveForWho(e) {
-    const name = e.currentTarget.dataset.name
-    const forWho = this.data.forWho.filter(n => n !== name)
-    this.setData({ forWho })
-  },
-
-  // ========== 提交操作 ==========
-  // 验证是否可以提交
+  // 验证
   canSubmit() {
-    const { event, amount } = this.data
-    return event.trim() && parseFloat(amount) > 0
+    return this.data.amount && parseFloat(this.data.amount) > 0 && this.data.selectedCategory
   },
 
-  // 构建提交数据
-  buildExpenseData() {
-    const { originalText, spentAt, event, amount, tags, focus, showStory, story, showForWho, forWho } = this.data
-    
-    const data = {
-      originalText: originalText || '',
-      spentAt: new Date(spentAt).toISOString(),
-      event: event.trim(),
-      amount: parseFloat(amount),
-      tags: tags,
-      generatedTags: this.data.suggestedTags,
-      focus: focus || null
-    }
-    
-    // 财记
-    if (showStory && (story.rating > 0 || story.emoji || story.text)) {
-      data.story = {
-        rating: story.rating,
-        emoji: story.emoji,
-        text: story.text
-      }
-    }
-    
-    // 代付
-    if (showForWho && forWho.length > 0) {
-      data.forWho = forWho
-    }
-    
-    return data
-  },
-
-  async onSubmit() {
+  // 提交
+  onSubmit() {
+    const that = this
     if (!this.canSubmit()) {
-      if (!this.data.event.trim()) {
-        showToast('请输入消费事件')
-      } else if (!parseFloat(this.data.amount)) {
-        showToast('请输入金额')
+      if (!this.data.amount || parseFloat(this.data.amount) <= 0) {
+        showToast('请输入有效金额')
+      } else if (!this.data.selectedCategory) {
+        showToast('请选择分类')
       }
       return
     }
 
-    const expenseData = this.buildExpenseData()
-
-    try {
-      if (this.data.isEditMode) {
-        await expenseService.updateExpense(this.data.expenseId, expenseData)
-        showToast('修改成功', 'success')
-      } else {
-        await expenseService.createExpense(expenseData)
-        showToast('记账成功', 'success')
-      }
-      
-      // 返回上一页
-      wx.navigateBack()
-    } catch (err) {
-      showToast(err.message || '操作失败')
+    const expenseData = {
+      amount: parseFloat(this.data.amount),
+      type: this.data.type,
+      focus: this.data.selectedCategory,
+      tags: [this.data.selectedCategory],
+      spentAt: new Date(this.data.spentAt).toISOString(),
+      remark: this.data.remark,
+      goal: this.data.linkGoal ? this.data.selectedGoal : null
     }
+
+    const promise = this.data.isEditMode 
+      ? expenseService.updateExpense(this.data.expenseId, expenseData)
+      : expenseService.createExpense(expenseData)
+    
+    promise.then(function() {
+      showToast(that.data.isEditMode ? '修改成功' : '记账成功', 'success')
+      wx.navigateBack()
+    }).catch(function(err) {
+      showToast(err.message || '操作失败')
+    })
   },
 
   // 删除
-  async onDelete() {
-    const confirmed = await showConfirm('确认删除', '删除后无法恢复，是否继续？')
-    if (!confirmed) return
-
-    try {
-      await expenseService.deleteExpense(this.data.expenseId)
-      showToast('删除成功', 'success')
-      wx.navigateBack()
-    } catch (err) {
-      showToast(err.message || '删除失败')
-    }
+  onDelete() {
+    const that = this
+    wx.showModal({
+      title: '确认删除',
+      content: '删除后无法恢复，是否继续？',
+      confirmColor: '#F53F3F',
+      success: function(res) {
+        if (!res.confirm) return
+        
+        expenseService.deleteExpense(that.data.expenseId).then(function() {
+          showToast('删除成功', 'success')
+          wx.navigateBack()
+        }).catch(function(err) {
+          showToast(err.message || '删除失败')
+        })
+      }
+    })
   }
 })

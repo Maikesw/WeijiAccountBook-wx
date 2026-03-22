@@ -1,6 +1,7 @@
-// 统计页 - 优化版本
+// 统计页 - 优化按钮交互版本
 const expenseService = require('../../services/expenseService')
 const { formatDate, formatAmount, getDaysInMonth } = require('../../utils/util')
+const feedback = require('../../utils/feedback')
 
 Page({
   data: {
@@ -66,7 +67,6 @@ Page({
     if (currentTimeTab === 'month') {
       expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
     } else if (currentTimeTab === 'year') {
-      // 获取全年数据
       const allExpenses = expenseService.getLocalExpenses()
       expenses = []
       for (let i = 0; i < allExpenses.length; i++) {
@@ -113,7 +113,7 @@ Page({
     const categoryMap = {}
     for (let i = 0; i < expenses.length; i++) {
       const item = expenses[i]
-      if (item.type === 'income') continue // 只统计支出
+      if (item.type === 'income') continue
       
       const category = item.focus || (item.tags && item.tags[0]) || '其他'
       if (!categoryMap[category]) {
@@ -143,13 +143,13 @@ Page({
     }
     
     stats.sort(function(a, b) { return b.value - a.value })
-    stats.splice(6) // 只显示前6个
+    stats.splice(6)
     
     this.setData({ categoryStats: stats })
   },
 
   // 加载明细列表
-  loadDetailList(reset = false) {
+  loadDetailList(reset) {
     if (reset) {
       this.setData({ currentPage: 1, detailList: [] })
     }
@@ -236,16 +236,18 @@ Page({
 
   // 绘制图表
   drawCharts() {
-    setTimeout(() => {
-      this.drawTrendChart()
-      this.drawPieChart()
+    const that = this
+    setTimeout(function() {
+      that.drawTrendChart()
+      that.drawPieChart()
     }, 300)
   },
 
   // 绘制趋势图
   drawTrendChart() {
+    const that = this
     const query = wx.createSelectorQuery()
-    query.select('#trendChart').fields({ node: true, size: true }).exec((res) => {
+    query.select('#trendChart').fields({ node: true, size: true }).exec(function(res) {
       if (!res[0]) return
       
       const canvas = res[0].node
@@ -264,7 +266,7 @@ Page({
       ctx.clearRect(0, 0, width, height)
       
       // 获取数据
-      const { currentYear, currentMonth } = this.data
+      const { currentYear, currentMonth } = that.data
       const days = getDaysInMonth(currentYear, currentMonth)
       const expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
       
@@ -366,14 +368,14 @@ Page({
       drawLine('income', '#00B42A')
       drawLine('expense', '#F53F3F')
       
-      // X轴标签（只显示部分日期）
+      // X轴标签
       ctx.fillStyle = '#86909C'
       ctx.font = '20rpx sans-serif'
       ctx.textAlign = 'center'
       const labelInterval = Math.ceil(days / 6)
       for (let i = 0; i < days; i += labelInterval) {
         const x = padding.left + (chartWidth / (days - 1)) * i
-        ctx.fillText(`${i + 1}日`, x, height - padding.bottom + 25)
+        ctx.fillText((i + 1) + '日', x, height - padding.bottom + 25)
       }
     })
   },
@@ -384,7 +386,7 @@ Page({
     if (categoryStats.length === 0) return
 
     const query = wx.createSelectorQuery()
-    query.select('#pieChart').fields({ node: true, size: true }).exec((res) => {
+    query.select('#pieChart').fields({ node: true, size: true }).exec(function(res) {
       if (!res[0]) return
       
       const canvas = res[0].node
@@ -398,7 +400,7 @@ Page({
       const centerX = res[0].width / 2
       const centerY = res[0].height / 2
       const radius = Math.min(centerX, centerY) - 30
-      const innerRadius = radius * 0.5 // 环形图内半径
+      const innerRadius = radius * 0.5
       
       let currentAngle = -Math.PI / 2
       
@@ -414,7 +416,7 @@ Page({
         ctx.fillStyle = item.color
         ctx.fill()
         
-        // 绘制百分比标签（大于5%才显示）
+        // 绘制百分比标签
         if (item.percent > 5) {
           const labelAngle = currentAngle + sliceAngle / 2
           const labelX = centerX + Math.cos(labelAngle) * (radius * 0.75)
@@ -442,10 +444,10 @@ Page({
     })
   },
 
-  // 切换时间标签
+  // 切换时间标签 - 带反馈
   switchTimeTab(e) {
     const tab = e.currentTarget.dataset.tab
-    this.setData({ currentTimeTab: tab })
+    feedback.switchFeedback(this, 'currentTimeTab', tab)
     this.loadData()
   },
 
@@ -460,13 +462,19 @@ Page({
     this.loadData()
   },
 
-  // 加载更多
+  // 加载更多 - 带反馈
   loadMore() {
+    feedback.buttonVisual('light')
+    this.setData({ loading: true })
     this.loadDetailList(false)
+    setTimeout(() => {
+      this.setData({ loading: false })
+    }, 500)
   },
 
-  // 查看详情
+  // 查看详情 - 带反馈
   viewDetail(e) {
+    feedback.buttonVisual('light')
     const id = e.currentTarget.dataset.id
     const app = getApp()
     const expense = expenseService.getExpenseById(id)
@@ -478,8 +486,9 @@ Page({
     }
   },
 
-  // 去记账
+  // 去记账 - 带反馈
   goAdd() {
+    feedback.buttonVisual('light')
     wx.switchTab({ url: '/pages/book/book' })
   }
 })

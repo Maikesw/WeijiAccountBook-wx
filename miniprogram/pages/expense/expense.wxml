@@ -5,7 +5,7 @@
     <view class="amount-label">金额</view>
     <view class="amount-input-wrap">
       <text class="currency">¥</text>
-      <input class="amount-input" type="digit" placeholder="0.00" 
+      <input style="height: 74rpx; display: block; box-sizing: border-box" class="amount-input" type="digit" placeholder="0.00" 
              value="{{amount}}" bindinput="onAmountInput" focus="{{true}}"/>
     </view>
     <view class="quick-amounts" wx:if="{{!isEditMode}}">

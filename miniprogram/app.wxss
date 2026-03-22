@@ -1,4 +1,4 @@
-/** 理财日记 - 全局样式规范 **/
+/** 理财日记 - 全局样式规范（含按钮交互系统） **/
 
 /* ========== 设计系统变量 ========== */
 page {
@@ -36,6 +36,7 @@ page {
   --shadow-sm: 0 2rpx 8rpx rgba(29, 33, 41, 0.08);
   --shadow-md: 0 4rpx 16rpx rgba(29, 33, 41, 0.12);
   --shadow-lg: 0 8rpx 24rpx rgba(29, 33, 41, 0.16);
+  --shadow-primary: 0 4rpx 12rpx rgba(22, 119, 255, 0.3);
   
   /* 间距系统 - 8rpx基准 */
   --space-xs: 8rpx;
@@ -58,6 +59,11 @@ page {
   font-family: var(--font-family);
   color: var(--neutral-900);
   line-height: 1.6;
+  
+  /* 交互时长变量 */
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
 }
 
 /* ========== 字体层级规范 ========== */
@@ -159,68 +165,425 @@ page {
   margin-top: var(--space-xs);
 }
 
-/* ========== 按钮组件 ========== */
+/* ========== 按钮交互系统（悬浮仿真效果） ========== */
+
+/* 基础按钮 - 悬浮效果 */
 .btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 96rpx;
+  min-height: 80rpx;
+  min-width: 80rpx;
   padding: 0 var(--space-md);
   border-radius: var(--radius-sm);
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 500;
-  transition: all 200ms ease;
+  /* 悬浮阴影 - 立体效果 */
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1),
+              0 8rpx 16rpx rgba(0, 0, 0, 0.08),
+              0 2rpx 4rpx rgba(0, 0, 0, 0.04);
+  /* 轻微上浮 */
+  transform: translateY(-2rpx);
+  transition: transform var(--duration-fast) ease, 
+              background-color var(--duration-normal) ease,
+              box-shadow var(--duration-fast) ease;
+  /* 防止文字被选中 */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn::after {
   border: none;
 }
 
-/* 主按钮 */
+/* 按钮hover状态 - 更明显的上浮 */
+.btn:hover {
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.12),
+              0 12rpx 24rpx rgba(0, 0, 0, 0.08),
+              0 4rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+/* 按钮点击状态 - 下沉反馈 */
+.btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1),
+              0 4rpx 8rpx rgba(0, 0, 0, 0.06),
+              inset 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
+  transition: transform var(--duration-fast) ease,
+              box-shadow var(--duration-fast) ease;
+}
+
+/* 按钮禁用状态 - 低饱和灰色，透明度60% */
+.btn[disabled] {
+  opacity: 0.6;
+  background-color: var(--neutral-300) !important;
+  color: var(--neutral-500) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.btn[disabled]::after {
+  border: none;
+}
+
+/* ===== 主按钮（核心操作按钮）- 悬浮仿真 ===== */
 .btn-primary {
-  background: var(--primary-600);
+  min-height: 96rpx;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
   color: var(--neutral-0);
-  box-shadow: 0 4rpx 12rpx rgba(22, 119, 255, 0.3);
+  /* 更强的悬浮阴影 */
+  box-shadow: 0 6rpx 12rpx rgba(22, 119, 255, 0.25),
+              0 10rpx 20rpx rgba(22, 119, 255, 0.15),
+              0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+  transform: translateY(-2rpx);
 }
 
+/* hover状态 - 上浮 + 阴影增强 */
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-400) 100%);
+  transform: translateY(-4rpx);
+  box-shadow: 0 10rpx 20rpx rgba(22, 119, 255, 0.3),
+              0 16rpx 32rpx rgba(22, 119, 255, 0.2),
+              0 6rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 点击状态 - 下沉 + 内阴影 */
 .btn-primary:active {
-  transform: scale(0.98);
-  background: var(--primary-500);
+  transform: translateY(2rpx);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
+  box-shadow: 0 2rpx 6rpx rgba(22, 119, 255, 0.2),
+              0 4rpx 8rpx rgba(0, 0, 0, 0.08),
+              inset 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
 }
 
-.btn-primary[disabled] {
-  opacity: 0.5;
-}
-
-/* 次要按钮 */
+/* ===== 次要按钮 - 悬浮仿真 ===== */
 .btn-secondary {
+  min-height: 80rpx;
   background: var(--neutral-0);
   color: var(--neutral-700);
   border: 2rpx solid var(--neutral-200);
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.06),
+              0 6rpx 12rpx rgba(0, 0, 0, 0.04);
+  transform: translateY(-2rpx);
+}
+
+.btn-secondary:hover {
+  background: var(--neutral-50);
+  border-color: var(--neutral-300);
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.08),
+              0 12rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
 .btn-secondary:active {
+  transform: translateY(2rpx);
   background: var(--neutral-100);
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.06),
+              inset 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
 }
 
-/* 核心操作按钮 - 加大20% */
-.btn-core {
-  height: 112rpx;
-  font-size: 36rpx;
-  font-weight: 600;
+/* ===== 成功按钮（正向操作）- 悬浮仿真 ===== */
+.btn-success {
+  min-height: 96rpx;
+  background: linear-gradient(135deg, var(--success-600) 0%, var(--success-500) 100%);
+  color: var(--neutral-0);
+  box-shadow: 0 6rpx 12rpx rgba(0, 180, 42, 0.25),
+              0 10rpx 20rpx rgba(0, 180, 42, 0.15);
+  transform: translateY(-2rpx);
 }
 
-/* 文字按钮 */
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--success-500) 0%, var(--success-400) 100%);
+  transform: translateY(-4rpx);
+  box-shadow: 0 10rpx 20rpx rgba(0, 180, 42, 0.3),
+              0 16rpx 32rpx rgba(0, 180, 42, 0.2);
+}
+
+.btn-success:active {
+  transform: translateY(2rpx);
+  background: linear-gradient(135deg, var(--success-600) 0%, var(--success-500) 100%);
+  box-shadow: 0 2rpx 6rpx rgba(0, 180, 42, 0.2),
+              inset 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+}
+
+/* ===== 危险按钮（删除等警示操作）- 悬浮仿真 ===== */
+.btn-danger {
+  min-height: 80rpx;
+  background: var(--neutral-0);
+  color: var(--error-600);
+  border: 2rpx solid var(--error-600);
+  box-shadow: 0 4rpx 8rpx rgba(245, 63, 63, 0.1),
+              0 6rpx 12rpx rgba(245, 63, 63, 0.06);
+  transform: translateY(-2rpx);
+}
+
+.btn-danger:hover {
+  background: var(--error-100);
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 16rpx rgba(245, 63, 63, 0.15),
+              0 12rpx 24rpx rgba(245, 63, 63, 0.1);
+}
+
+.btn-danger:active {
+  transform: translateY(2rpx);
+  background: var(--error-100);
+  box-shadow: 0 2rpx 4rpx rgba(245, 63, 63, 0.1),
+              inset 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 文字按钮 - 悬浮仿真 ===== */
 .btn-text {
+  min-height: 64rpx;
   background: transparent;
   color: var(--primary-600);
   font-size: 28rpx;
+  padding: 0 var(--space-sm);
+  box-shadow: none;
+  transform: none;
 }
 
-/* 危险按钮 */
-.btn-danger {
-  background: var(--error-600);
-  color: var(--neutral-0);
+.btn-text:hover {
+  background: var(--primary-100);
+  box-shadow: 0 2rpx 4rpx rgba(22, 119, 255, 0.1);
+  transform: translateY(-2rpx);
+}
+
+.btn-text:active {
+  transform: translateY(1rpx);
+  background: var(--primary-100);
+  box-shadow: inset 0 1rpx 2rpx rgba(0, 0, 0, 0.05);
+}
+
+/* ===== 核心操作按钮（加大20%，≥48×48dp） ===== */
+.btn-core {
+  min-height: 112rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  padding: 0 var(--space-lg);
+}
+
+/* ===== 图标按钮（40×40dp）- 悬浮仿真 ===== */
+.btn-icon {
+  width: 80rpx;
+  height: 80rpx;
+  min-width: 80rpx;
+  min-height: 80rpx;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--neutral-0);
+  font-size: 40rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.08),
+              0 4rpx 8rpx rgba(0, 0, 0, 0.04);
+  transform: translateY(-2rpx);
+}
+
+.btn-icon:hover {
+  background: var(--neutral-100);
+  transform: translateY(-4rpx);
+  box-shadow: 0 6rpx 12rpx rgba(0, 0, 0, 0.1),
+              0 8rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.btn-icon:active {
+  transform: translateY(2rpx);
+  background: var(--neutral-100);
+  box-shadow: 0 1rpx 3rpx rgba(0, 0, 0, 0.06),
+              inset 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 功能按钮（40×40dp，图标+文字） ===== */
+.btn-function {
+  min-height: 80rpx;
+  padding: 0 var(--space-sm);
+  background: var(--neutral-0);
+  border: 2rpx solid var(--neutral-200);
+  border-radius: var(--radius-sm);
+  font-size: 26rpx;
+  color: var(--neutral-700);
+}
+
+.btn-function .btn-icon-text {
+  margin-right: var(--space-xs);
+  font-size: 32rpx;
+}
+
+.btn-function:hover {
+  background: var(--neutral-100);
+}
+
+.btn-function:active {
+  transform: scale(0.95);
+}
+
+/* ========== 切换按钮组（Segmented Control） ========== */
+.switch-group {
+  display: flex;
+  background: var(--neutral-100);
+  border-radius: var(--radius-sm);
+  padding: 6rpx;
+}
+
+.switch-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72rpx;
+  padding: 0 var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 28rpx;
+  color: var(--neutral-700);
+  transition: all var(--duration-normal) ease;
+  /* 防止文字被选中 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.switch-item:active {
+  transform: scale(0.95);
+}
+
+/* 选中状态 - 平滑切换动画200ms */
+.switch-active {
+  background: var(--neutral-0);
+  color: var(--primary-600);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-normal) ease;
+}
+
+/* 收入/支出专用切换 */
+.switch-income.switch-active {
+  background: var(--success-100);
+  color: var(--success-600);
+}
+
+.switch-expense.switch-active {
+  background: var(--error-100);
+  color: var(--error-600);
+}
+
+/* ========== 底部固定操作栏 ========== */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-md);
+  padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+  background: var(--neutral-0);
+  box-shadow: 0 -4rpx 16rpx rgba(29, 33, 41, 0.08);
+  display: flex;
+  gap: var(--space-sm);
+  z-index: 100;
+}
+
+.action-bar .btn {
+  flex: 1;
+}
+
+.action-bar .btn-secondary {
+  flex: 0 0 200rpx;
+}
+
+/* ========== 模态弹窗（二次确认） ========== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--duration-normal) ease;
+  z-index: 1000;
+}
+
+.modal-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  width: 560rpx;
+  background: var(--neutral-0);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.9);
+  transition: transform var(--duration-normal) ease;
+}
+
+.modal-show .modal-content {
+  transform: scale(1);
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--neutral-900);
+  text-align: center;
+  margin-bottom: var(--space-sm);
+}
+
+.modal-message {
+  font-size: 30rpx;
+  color: var(--neutral-700);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* ========== 加载状态 ========== */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: var(--neutral-500);
+  margin-left: var(--space-sm);
+}
+
+.load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  min-height: 80rpx;
+}
+
+.load-more-text {
+  font-size: 26rpx;
+  color: var(--primary-600);
+}
+
+.no-more {
+  text-align: center;
+  padding: var(--space-md);
+  min-height: 80rpx;
+}
+
+.no-more-text {
+  font-size: 24rpx;
+  color: var(--neutral-400);
 }
 
 /* ========== 输入框组件 ========== */
@@ -232,7 +595,7 @@ page {
   border-radius: var(--radius-sm);
   font-size: 32rpx;
   color: var(--neutral-900);
-  transition: all 200ms ease;
+  transition: all var(--duration-normal) ease;
 }
 
 .input:focus {
@@ -266,7 +629,7 @@ page {
   border-color: var(--primary-600);
 }
 
-/* ========== 标签组件 ========== */
+/* ========== 标签组件 - 悬浮仿真 ========== */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -278,6 +641,25 @@ page {
   font-weight: 500;
   margin-right: var(--space-xs);
   margin-bottom: var(--space-xs);
+  /* 轻微悬浮阴影 */
+  box-shadow: 0 2rpx 4rpx rgba(22, 119, 255, 0.1);
+  transform: translateY(-1rpx);
+  transition: transform var(--duration-fast) ease,
+              box-shadow var(--duration-fast) ease;
+  /* 防止文字被选中 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tag:hover {
+  transform: translateY(-2rpx);
+  box-shadow: 0 4rpx 8rpx rgba(22, 119, 255, 0.15);
+}
+
+.tag:active {
+  transform: translateY(1rpx);
+  box-shadow: 0 1rpx 2rpx rgba(22, 119, 255, 0.08),
+              inset 0 1rpx 2rpx rgba(0, 0, 0, 0.05);
 }
 
 .tag-active {
@@ -295,16 +677,33 @@ page {
   color: var(--error-600);
 }
 
-/* ========== 列表组件 ========== */
+/* ========== 列表组件 - 悬浮仿真 ========== */
 .list-item {
   display: flex;
   align-items: center;
-  padding: var(--space-sm) 0;
+  padding: var(--space-sm) var(--space-sm);
+  margin: 0 calc(-1 * var(--space-sm));
+  border-radius: var(--radius-sm);
   border-bottom: 2rpx solid var(--neutral-100);
+  transition: background-color var(--duration-fast) ease,
+              transform var(--duration-fast) ease,
+              box-shadow var(--duration-fast) ease;
+  /* 防止文字被选中 */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .list-item:last-child {
   border-bottom: none;
+}
+
+.list-item:hover {
+  background-color: var(--neutral-50);
+}
+
+.list-item:active {
+  background-color: var(--neutral-100);
+  transform: translateY(1rpx);
 }
 
 .list-icon {
@@ -383,26 +782,47 @@ page {
   text-align: center;
 }
 
-/* ========== 浮动按钮 ========== */
+/* ========== 浮动按钮（FAB）- 悬浮仿真 ========== */
 .fab {
   position: fixed;
   right: var(--space-md);
   bottom: 180rpx;
   width: 112rpx;
   height: 112rpx;
-  background: var(--primary-600);
+  min-width: 112rpx;
+  min-height: 112rpx;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-lg);
+  /* 强烈悬浮阴影 */
+  box-shadow: 0 8rpx 16rpx rgba(22, 119, 255, 0.3),
+              0 12rpx 24rpx rgba(22, 119, 255, 0.2),
+              0 4rpx 8rpx rgba(0, 0, 0, 0.15);
+  transform: translateY(-4rpx);
   z-index: 100;
-  transition: all 200ms ease;
+  transition: transform var(--duration-fast) ease, 
+              box-shadow var(--duration-fast) ease;
+  /* 防止文字被选中 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.fab:hover {
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-400) 100%);
+  transform: translateY(-8rpx);
+  box-shadow: 0 12rpx 24rpx rgba(22, 119, 255, 0.35),
+              0 20rpx 40rpx rgba(22, 119, 255, 0.25),
+              0 6rpx 12rpx rgba(0, 0, 0, 0.2);
 }
 
 .fab:active {
-  transform: scale(0.95);
-  background: var(--primary-500);
+  transform: translateY(2rpx);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
+  box-shadow: 0 4rpx 8rpx rgba(22, 119, 255, 0.2),
+              0 6rpx 12rpx rgba(0, 0, 0, 0.1),
+              inset 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
 }
 
 .fab-icon {
@@ -422,7 +842,7 @@ page {
 .progress-fill {
   height: 100%;
   border-radius: var(--radius-full);
-  transition: width 300ms ease;
+  transition: width var(--duration-slow) ease;
 }
 
 .progress-fill.success {
@@ -437,7 +857,7 @@ page {
   background: var(--error-600);
 }
 
-/* ========== 网格布局 ========== */
+/* ========== 网格布局 - 悬浮仿真 ========== */
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -452,13 +872,27 @@ page {
   justify-content: center;
   background: var(--neutral-0);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  transition: all 200ms ease;
+  /* 悬浮阴影 */
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.08),
+              0 6rpx 12rpx rgba(0, 0, 0, 0.04);
+  transform: translateY(-2rpx);
+  transition: transform var(--duration-fast) ease,
+              box-shadow var(--duration-fast) ease;
+  /* 防止文字被选中 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.grid-item:hover {
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.1),
+              0 12rpx 24rpx rgba(0, 0, 0, 0.06);
 }
 
 .grid-item:active {
-  transform: scale(0.98);
-  box-shadow: var(--shadow-md);
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.06),
+              inset 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
 }
 
 .grid-icon {
@@ -546,4 +980,37 @@ page {
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ========== 震动反馈类（JS调用） ========== */
+.vibrate {
+  /* 此类用于JS触发震动 */
+}
+
+/* ========== 动画关键帧 ========== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); }
+  to { transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) ease;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-normal) ease;
+}
+
+.animate-slide-up {
+  animation: slideUp var(--duration-normal) ease;
 }

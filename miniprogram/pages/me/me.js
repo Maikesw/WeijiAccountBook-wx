@@ -1,6 +1,7 @@
-// 个人中心 - 优化版本
+// 个人中心 - 优化按钮交互版本
 const expenseService = require('../../services/expenseService')
 const { showToast, formatAmount } = require('../../utils/util')
+const feedback = require('../../utils/feedback')
 
 Page({
   data: {
@@ -93,9 +94,7 @@ Page({
         break
       }
     }
-    this.setData({
-      fontSizeLabel: label
-    })
+    this.setData({ fontSizeLabel: label })
   },
 
   // 计算缓存大小
@@ -115,8 +114,9 @@ Page({
     }
   },
 
-  // 切换深色模式
+  // 切换深色模式 - 带反馈
   toggleDarkMode(e) {
+    feedback.buttonVisual('light')
     const darkMode = e.detail.value
     this.setData({ darkMode })
     
@@ -127,8 +127,9 @@ Page({
     showToast(darkMode ? '已开启深色模式' : '已关闭深色模式')
   },
 
-  // 显示字体选择
+  // 显示字体选择 - 带反馈
   adjustFontSize() {
+    feedback.buttonVisual('light')
     this.setData({ showFontModal: true })
   },
 
@@ -139,8 +140,9 @@ Page({
 
   stopPropagation() {},
 
-  // 设置字体大小
+  // 设置字体大小 - 带反馈
   setFontSize(e) {
+    feedback.buttonVisual('light')
     const size = e.currentTarget.dataset.size
     this.setData({ fontSize: size })
     this.updateFontLabel()
@@ -149,87 +151,78 @@ Page({
     settings.fontSize = size
     wx.setStorageSync('appSettings', settings)
     
-    // 应用到页面
-    this.applyFontSize(size)
-    
     this.hideFontModal()
     showToast('字体大小已调整')
   },
 
-  // 应用字体大小
-  applyFontSize(size) {
-    const scaleMap = {
-      small: 0.9,
-      normal: 1,
-      large: 1.15,
-      xlarge: 1.3
-    }
-    
-    // 通过设置页面根字体大小来实现
-    // 实际项目中可以通过 CSS 变量或 class 切换实现
-  },
-
-  // 清理缓存
+  // 清理缓存 - 带二次确认
   clearCache() {
-    wx.showModal({
+    feedback.confirmAction({
       title: '清理缓存',
       content: '清理后需要重新登录，确定继续吗？',
-      success: function(res) {
-        if (res.confirm) {
-          wx.clearStorage()
-          showToast('缓存已清理')
-          setTimeout(function() {
-            wx.reLaunch({ url: '/pages/book/book' })
-          }, 1000)
-        }
+      confirmText: '清理',
+      confirmColor: '#FF7D00',
+      onConfirm: function() {
+        wx.clearStorage()
+        feedback.showSuccess('缓存已清理', function() {
+          wx.reLaunch({ url: '/pages/book/book' })
+        })
       }
     })
   },
 
-  // 清空所有数据
+  // 清空所有数据 - 带二次确认和危险震动
   clearAllData() {
     const that = this
-    wx.showModal({
+    
+    feedback.confirmAction({
       title: '危险操作',
       content: '此操作将删除所有账单数据，且无法恢复！确定继续吗？',
+      confirmText: '删除',
       confirmColor: '#F53F3F',
-      success: function(res) {
-        if (res.confirm) {
-          wx.showModal({
-            title: '再次确认',
-            content: '数据删除后无法找回，请谨慎操作',
-            confirmColor: '#F53F3F',
-            success: function(res2) {
-              if (res2.confirm) {
-                expenseService.clearAll()
-                showToast('数据已清空')
-                that.loadUserStats()
-              }
-            }
-          })
-        }
+      vibrateType: 'heavy',
+      onConfirm: function() {
+        // 二次确认
+        feedback.confirmAction({
+          title: '再次确认',
+          content: '数据删除后无法找回，请谨慎操作',
+          confirmText: '确认删除',
+          confirmColor: '#F53F3F',
+          vibrateType: 'heavy',
+          onConfirm: function() {
+            expenseService.clearAll()
+            feedback.showSuccess('数据已清空', function() {
+              that.loadUserStats()
+            })
+          }
+        })
       }
     })
   },
 
-  // 导航功能
+  // 导航功能 - 带反馈
   goToSecurity() {
+    feedback.buttonVisual('light')
     showToast('安全中心开发中')
   },
 
   goToGoals() {
+    feedback.buttonVisual('light')
     showToast('存钱目标开发中')
   },
 
   goToBudget() {
+    feedback.buttonVisual('light')
     showToast('预算设置开发中')
   },
 
   goToCategories() {
+    feedback.buttonVisual('light')
     showToast('分类管理开发中')
   },
 
   backupData() {
+    feedback.buttonVisual('light')
     wx.showActionSheet({
       itemList: ['导出为Excel', '导出为图片', '同步到云端'],
       success: function(res) {
@@ -240,14 +233,17 @@ Page({
   },
 
   goToNotification() {
+    feedback.buttonVisual('light')
     showToast('通知设置开发中')
   },
 
   showHelp() {
+    feedback.buttonVisual('light')
     wx.navigateTo({ url: '/pages/help/help' })
   },
 
   feedback() {
+    feedback.buttonVisual('light')
     wx.showModal({
       title: '意见反馈',
       editable: true,
@@ -261,6 +257,7 @@ Page({
   },
 
   showAbout() {
+    feedback.buttonVisual('light')
     wx.showModal({
       title: '关于理财日记',
       content: '理财日记 v1.0.0\n\n一款简洁高效的记账工具\n帮助您轻松管理日常收支\n\n© 2024 理财日记',
@@ -269,10 +266,12 @@ Page({
   },
 
   showPrivacy() {
+    feedback.buttonVisual('light')
     wx.navigateTo({ url: '/pages/privacy/privacy' })
   },
 
   showAgreement() {
+    feedback.buttonVisual('light')
     wx.navigateTo({ url: '/pages/agreement/agreement' })
   }
 })

@@ -316,25 +316,29 @@
   box-shadow: 0 -4rpx 16rpx rgba(29, 33, 41, 0.08);
   display: flex;
   gap: var(--space-sm);
+  z-index: 100;
 }
 
 .save-btn {
   flex: 1;
-  height: 96rpx;
-  font-size: 32rpx;
+  min-height: 112rpx;
+  font-size: 34rpx;
   font-weight: 600;
 }
 
 .delete-btn {
-  width: 200rpx;
-  height: 96rpx;
+  flex: 0 0 200rpx;
+  min-height: 112rpx;
   font-size: 30rpx;
   color: var(--error-600);
   border-color: var(--error-600);
 }
 
 .btn-disabled {
-  opacity: 0.5;
+  opacity: 0.6;
+  background-color: var(--neutral-300) !important;
+  color: var(--neutral-500) !important;
+  box-shadow: none !important;
 }
 
 /* 工具类 */

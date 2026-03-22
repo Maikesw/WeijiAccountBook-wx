@@ -1,6 +1,7 @@
-// 记账页 - 优化版本
+// 记账页 - 优化按钮交互版本
 const expenseService = require('../../services/expenseService')
 const { formatDate, formatAmount, showToast } = require('../../utils/util')
+const feedback = require('../../utils/feedback')
 
 Page({
   data: {
@@ -30,7 +31,10 @@ Page({
     // 存钱目标
     linkGoal: false,
     selectedGoal: '',
-    savingsGoals: []
+    savingsGoals: [],
+    
+    // 按钮加载状态
+    saving: false
   },
 
   onLoad() {
@@ -111,12 +115,11 @@ Page({
       amount: expense.amount ? formatAmount(expense.amount) : '',
       selectedCategory: expense.focus || expense.tags[0] || '',
       spentAt: spentAt,
-      remark: expense.remark || expense.story?.text || '',
+      remark: expense.remark || expense.story && expense.story.text || '',
       linkGoal: !!expense.goal,
       selectedGoal: expense.goal || ''
     })
     
-    // 根据类型更新分类
     this.initCategories()
     this.updateDateDisplay()
   },
@@ -124,7 +127,6 @@ Page({
   // 金额输入
   onAmountInput(e) {
     let value = e.detail.value
-    // 限制两位小数
     if (value.indexOf('.') > -1) {
       const parts = value.split('.')
       if (parts[1] && parts[1].length > 2) {
@@ -136,21 +138,25 @@ Page({
 
   // 快捷金额
   setQuickAmount(e) {
+    // 触发按钮反馈
+    feedback.buttonVisual('light')
     this.setData({ amount: e.currentTarget.dataset.amount })
   },
 
-  // 切换类型
+  // 切换类型 - 带反馈
   switchType(e) {
     const type = e.currentTarget.dataset.type
-    this.setData({ 
-      type: type,
-      selectedCategory: '' // 清空分类选择
-    })
-    this.initCategories()
+    
+    // 切换反馈
+    feedback.switchFeedback(this, 'type', type, function() {
+      this.setData({ selectedCategory: '' })
+      this.initCategories()
+    }.bind(this))
   },
 
-  // 选择分类
+  // 选择分类 - 带反馈
   selectCategory(e) {
+    feedback.buttonVisual('light')
     const category = e.currentTarget.dataset.category
     this.setData({ selectedCategory: category.name })
   },
@@ -168,16 +174,13 @@ Page({
 
   // 切换关联目标
   toggleLinkGoal(e) {
-    this.setData({ 
-      linkGoal: e.detail.value,
-      selectedGoal: e.detail.value ? this.data.selectedGoal : ''
-    })
+    feedback.switchFeedback(this, 'linkGoal', e.detail.value)
   },
 
   // 选择目标
   selectGoal(e) {
-    const goal = e.currentTarget.dataset.goal
-    this.setData({ selectedGoal: goal.name })
+    feedback.buttonVisual('light')
+    this.setData({ selectedGoal: e.currentTarget.dataset.goal.name })
   },
 
   // 验证
@@ -185,9 +188,10 @@ Page({
     return this.data.amount && parseFloat(this.data.amount) > 0 && this.data.selectedCategory
   },
 
-  // 提交
+  // 提交 - 带按钮反馈
   onSubmit() {
     const that = this
+    
     if (!this.canSubmit()) {
       if (!this.data.amount || parseFloat(this.data.amount) <= 0) {
         showToast('请输入有效金额')
@@ -196,6 +200,13 @@ Page({
       }
       return
     }
+
+    // 按钮反馈
+    feedback.buttonVisual('light')
+    
+    // 设置加载状态
+    this.setData({ saving: true })
+    feedback.showLoading('保存中...')
 
     const expenseData = {
       amount: parseFloat(this.data.amount),
@@ -212,27 +223,37 @@ Page({
       : expenseService.createExpense(expenseData)
     
     promise.then(function() {
-      showToast(that.data.isEditMode ? '修改成功' : '记账成功', 'success')
-      wx.navigateBack()
+      feedback.hideLoading()
+      that.setData({ saving: false })
+      feedback.showSuccess(that.data.isEditMode ? '修改成功' : '记账成功', function() {
+        wx.navigateBack()
+      })
     }).catch(function(err) {
+      feedback.hideLoading()
+      that.setData({ saving: false })
       showToast(err.message || '操作失败')
     })
   },
 
-  // 删除
+  // 删除 - 带二次确认
   onDelete() {
     const that = this
-    wx.showModal({
+    
+    feedback.confirmAction({
       title: '确认删除',
       content: '删除后无法恢复，是否继续？',
+      confirmText: '删除',
       confirmColor: '#F53F3F',
-      success: function(res) {
-        if (!res.confirm) return
-        
+      vibrateType: 'heavy',
+      onConfirm: function() {
+        feedback.showLoading('删除中...')
         expenseService.deleteExpense(that.data.expenseId).then(function() {
-          showToast('删除成功', 'success')
-          wx.navigateBack()
+          feedback.hideLoading()
+          feedback.showSuccess('删除成功', function() {
+            wx.navigateBack()
+          })
         }).catch(function(err) {
+          feedback.hideLoading()
           showToast(err.message || '删除失败')
         })
       }

@@ -1,6 +1,7 @@
-// 账本页 - 优化版本
+// 账本页 - 优化按钮交互版本
 const expenseService = require('../../services/expenseService')
 const { formatDate, formatAmount } = require('../../utils/util')
+const feedback = require('../../utils/feedback')
 
 Page({
   data: {
@@ -30,7 +31,7 @@ Page({
       { name: '交通', icon: '🚇', type: 'expense', bgColor: '#E6F4FF', color: '#1677FF' },
       { name: '工资', icon: '💰', type: 'income', bgColor: '#E8FFEA', color: '#00B42A' },
       { name: '购物', icon: '🛍️', type: 'expense', bgColor: '#FFECE8', color: '#F53F3F' },
-      { name: '娱乐', icon: '🎮', type: 'expense', bgColor: '#F0F5FF', color: '#165DFF' }
+      { name: '娱乐', icon: '🎮', type: 'expense', bgColor: '#F5F0FF', color: '#165DFF' }
     ],
     
     // 最近账单
@@ -90,7 +91,6 @@ Page({
 
   // 加载预算数据
   loadBudget() {
-    // 从本地存储获取预算设置
     const budget = wx.getStorageSync('monthlyBudget') || 5000
     const { currentYear, currentMonth } = this.data
     const expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
@@ -118,16 +118,13 @@ Page({
     const { currentYear, currentMonth } = this.data
     const expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
     
-    // 获取最近5条
     const recent = []
     const sliceData = expenses.slice(0, 5)
     for (let i = 0; i < sliceData.length; i++) {
       recent.push(this.formatExpenseItem(sliceData[i]))
     }
     
-    this.setData({
-      recentExpenses: recent
-    })
+    this.setData({ recentExpenses: recent })
   },
 
   // 格式化账单项
@@ -196,19 +193,19 @@ Page({
     }, 500)
   },
 
-  // 添加支出
+  // 添加支出 - FAB按钮
   onAddExpense() {
+    feedback.buttonVisual('light')
     const app = getApp()
     app.globalData.isEditMode = false
     app.globalData.currentExpense = null
     
-    wx.navigateTo({
-      url: '/pages/expense/expense'
-    })
+    wx.navigateTo({ url: '/pages/expense/expense' })
   },
 
-  // 快捷分类记账
+  // 快捷分类记账 - 带反馈
   quickAddByCategory(e) {
+    feedback.buttonVisual('light')
     const category = e.currentTarget.dataset.category
     const app = getApp()
     
@@ -218,18 +215,17 @@ Page({
       type: category.type
     }
     
-    wx.navigateTo({
-      url: '/pages/expense/expense'
-    })
+    wx.navigateTo({ url: '/pages/expense/expense' })
   },
 
   // 编辑账单
   onEditExpense(e) {
+    feedback.buttonVisual('light')
     const id = e.currentTarget.dataset.id
     const expense = expenseService.getExpenseById(id)
     
     if (!expense) {
-      wx.showToast({ title: '未找到该记录', icon: 'none' })
+      showToast('未找到该记录')
       return
     }
     
@@ -237,29 +233,30 @@ Page({
     app.globalData.isEditMode = true
     app.globalData.currentExpense = expense
     
-    wx.navigateTo({
-      url: '/pages/expense/expense'
-    })
+    wx.navigateTo({ url: '/pages/expense/expense' })
   },
 
-  // 查看全部账单
+  // 查看更多 - 带反馈
   viewAllExpenses() {
-    // 可以展开更多或跳转到详情页
+    feedback.buttonVisual('light')
     wx.showToast({ title: '功能开发中', icon: 'none' })
   },
 
   // 跳转到统计页
   goToReport() {
+    feedback.buttonVisual('light')
     wx.switchTab({ url: '/pages/report/report' })
   },
 
   // 跳转到预算管理
   goToBudget() {
+    feedback.buttonVisual('light')
     wx.showToast({ title: '预算管理开发中', icon: 'none' })
   },
 
   // 跳转到存钱目标
   goToGoal() {
+    feedback.buttonVisual('light')
     wx.showToast({ title: '存钱目标开发中', icon: 'none' })
   }
 })

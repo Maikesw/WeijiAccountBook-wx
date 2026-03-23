@@ -83,7 +83,7 @@
 
       <!-- 空状态 -->
       <view wx:if="{{categoryBudgets.length === 0}}" class="empty-state">
-        <text class="empty-icon">📊</text>
+        <text class="empty-icon" style="width: 99rpx; height: 112rpx; display: block; box-sizing: border-box">📊</text>
         <text class="empty-title">还没有分类预算</text>
         <text class="empty-desc">为不同消费类别设置预算，控制支出</text>
         <button class="btn btn-primary btn-core" style="margin-top: 32rpx; width: 400rpx;" bindtap="showAddModal">

@@ -80,7 +80,7 @@
 
       <!-- 空状态 -->
       <view wx:if="{{goals.length === 0}}" class="empty-state">
-        <text class="empty-icon">🎯</text>
+        <text class="empty-icon" style="width: 97rpx; height: 112rpx; display: block; box-sizing: border-box">🎯</text>
         <text class="empty-title">还没有存钱目标</text>
         <text class="empty-desc">设定一个小目标，开始存钱之旅</text>
         <button class="btn btn-primary btn-core" style="margin-top: 32rpx; width: 400rpx;" bindtap="showAddModal">

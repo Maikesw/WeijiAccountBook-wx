@@ -224,12 +224,147 @@ Page({
   backupData() {
     feedback.buttonVisual('light')
     wx.showActionSheet({
-      itemList: ['导出为Excel', '导出为图片', '同步到云端'],
-      success: function(res) {
-        const actions = ['导出Excel开发中', '导出图片开发中', '同步开发中']
-        showToast(actions[res.tapIndex])
+      itemList: ['同步到云端（备份）', '从云端恢复', '导出为Excel'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.syncToCloud()
+        } else if (res.tapIndex === 1) {
+          this.restoreFromCloud()
+        } else {
+          showToast('导出Excel开发中')
+        }
       }
     })
+  },
+
+  // 同步数据到云端
+  syncToCloud() {
+    wx.showLoading({ title: '正在同步...', mask: true })
+    
+    const expenses = expenseService.getLocalExpenses()
+    
+    if (expenses.length === 0) {
+      wx.hideLoading()
+      wx.showModal({
+        title: '提示',
+        content: '当前没有账单数据需要备份',
+        showCancel: false
+      })
+      return
+    }
+
+    wx.cloud.callFunction({
+      name: 'syncExpenses',
+      data: { expenses: expenses }
+    }).then(res => {
+      wx.hideLoading()
+      
+      console.log('云函数返回:', res)
+      
+      if (res.result && res.result.success) {
+        const syncedCount = res.result.syncedCount || expenses.length
+        wx.showModal({
+          title: '同步成功',
+          content: `成功备份 ${syncedCount} 条账单数据到云端`,
+          showCancel: false,
+          success: () => {
+            const now = new Date().toLocaleString('zh-CN')
+            wx.setStorageSync('lastSyncTime', now)
+          }
+        })
+      } else {
+        const errorMsg = res.result?.message || JSON.stringify(res.result) || '未知错误'
+        wx.showModal({
+          title: '同步失败',
+          content: errorMsg,
+          showCancel: false
+        })
+      }
+    }).catch(err => {
+      wx.hideLoading()
+      console.error('同步失败:', err)
+      wx.showModal({
+        title: '同步失败',
+        content: '调用错误: ' + (err.message || JSON.stringify(err)),
+        showCancel: false
+      })
+    })
+  },
+
+  // 从云端恢复数据
+  restoreFromCloud() {
+    feedback.confirmAction({
+      title: '恢复数据',
+      content: '从云端恢复会合并云端数据到本地，是否继续？',
+      confirmText: '恢复',
+      confirmColor: '#1677FF',
+      onConfirm: () => {
+        wx.showLoading({ title: '正在恢复...', mask: true })
+        
+        wx.cloud.callFunction({
+          name: 'getExpenses',
+          data: { limit: 1000 }
+        }).then(res => {
+          wx.hideLoading()
+          
+          if (res.result && res.result.success) {
+            const cloudData = res.result.data || []
+            
+            if (cloudData.length === 0) {
+              wx.showModal({
+                title: '提示',
+                content: '云端没有备份数据',
+                showCancel: false
+              })
+              return
+            }
+
+            const localData = expenseService.getLocalExpenses()
+            const mergedData = this.mergeExpenses(localData, cloudData)
+            
+            expenseService.saveLocalExpenses(mergedData)
+            
+            this.loadUserStats()
+            
+            wx.showModal({
+              title: '恢复成功',
+              content: `从云端恢复 ${cloudData.length} 条数据\n合并后共 ${mergedData.length} 条账单`,
+              showCancel: false
+            })
+          } else {
+            wx.showModal({
+              title: '恢复失败',
+              content: res.result?.message || '未知错误，请重试',
+              showCancel: false
+            })
+          }
+        }).catch(err => {
+          wx.hideLoading()
+          console.error('恢复失败:', err)
+          wx.showModal({
+            title: '恢复失败',
+            content: '网络错误，请检查网络连接后重试',
+            showCancel: false
+          })
+        })
+      }
+    })
+  },
+
+  // 合并本地和云端数据（去重）
+  mergeExpenses(localData, cloudData) {
+    const merged = [...localData]
+    const localIds = new Set(localData.map(item => item._id))
+    
+    for (const cloudItem of cloudData) {
+      if (!localIds.has(cloudItem._id)) {
+        merged.push(cloudItem)
+      }
+    }
+    
+    merged.sort((a, b) => new Date(b.spentAt) - new Date(a.spentAt))
+    
+    return merged
   },
 
   goToNotification() {

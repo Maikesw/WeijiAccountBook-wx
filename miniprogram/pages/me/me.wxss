@@ -1,31 +1,31 @@
 /* 个人中心 - 优化样式 */
 
 .page-container {
-  padding: var(--space-sm);
+  padding: 16rpx;
   padding-bottom: 40rpx;
 }
 
 /* 用户信息卡片 */
 .user-card {
-  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
-  border-radius: var(--radius-md);
-  padding: var(--space-lg);
-  margin-bottom: var(--space-sm);
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #1677FF 0%, #4096FF 100%);
+  border-radius: 12rpx;
+  padding: 32rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(29, 33, 41, 0.12);
 }
 
 .user-header {
   display: flex;
   align-items: center;
-  margin-bottom: var(--space-lg);
+  margin-bottom: 32rpx;
 }
 
 .user-avatar {
   width: 120rpx;
   height: 120rpx;
-  border-radius: var(--radius-full);
+  border-radius: 9999rpx;
   overflow: hidden;
-  margin-right: var(--space-md);
+  margin-right: 24rpx;
   border: 4rpx solid rgba(255, 255, 255, 0.3);
   background: rgba(255, 255, 255, 0.2);
 }
@@ -38,7 +38,7 @@
 .user-name {
   font-size: 40rpx;
   font-weight: 600;
-  color: var(--neutral-0);
+  color: #FFFFFF;
   display: block;
   margin-bottom: 8rpx;
 }
@@ -53,7 +53,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding-top: var(--space-md);
+  padding-top: 24rpx;
   border-top: 2rpx solid rgba(255, 255, 255, 0.2);
 }
 
@@ -66,7 +66,7 @@
 .stat-value {
   font-size: 40rpx;
   font-weight: 700;
-  color: var(--neutral-0);
+  color: #FFFFFF;
   margin-bottom: 8rpx;
 }
 
@@ -86,11 +86,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-md);
-  background: var(--neutral-0);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-md);
-  box-shadow: var(--shadow-sm);
+  padding: 24rpx;
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(29, 33, 41, 0.08);
 }
 
 .security-left {
@@ -100,47 +100,47 @@
 
 .security-icon {
   font-size: 40rpx;
-  margin-right: var(--space-sm);
+  margin-right: 16rpx;
 }
 
 .security-text {
   font-size: 30rpx;
   font-weight: 500;
-  color: var(--neutral-900);
+  color: #1D2129;
 }
 
 .security-arrow {
   font-size: 36rpx;
-  color: var(--neutral-400);
+  color: #A9AEB8;
 }
 
 /* 区块标题 */
 .section-block {
-  margin-bottom: var(--space-md);
+  margin-bottom: 24rpx;
 }
 
 .section-title {
   font-size: 24rpx;
   font-weight: 600;
-  color: var(--neutral-500);
-  margin-bottom: var(--space-sm);
-  margin-left: var(--space-xs);
+  color: #86909C;
+  margin-bottom: 16rpx;
+  margin-left: 8rpx;
   display: block;
 }
 
 /* 功能列表 */
 .func-list {
-  background: var(--neutral-0);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(29, 33, 41, 0.08);
   overflow: hidden;
 }
 
 .func-item {
   display: flex;
   align-items: center;
-  padding: var(--space-md);
-  border-bottom: 2rpx solid var(--neutral-100);
+  padding: 24rpx;
+  border-bottom: 2rpx solid #F5F7FA;
   transition: all 200ms ease;
 }
 
@@ -149,36 +149,36 @@
 }
 
 .func-item:active {
-  background: var(--neutral-100);
+  background: #F5F7FA;
 }
 
 .func-icon {
   width: 72rpx;
   height: 72rpx;
-  border-radius: var(--radius-sm);
+  border-radius: 8rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40rpx;
-  margin-right: var(--space-sm);
+  margin-right: 16rpx;
   flex-shrink: 0;
 }
 
 .func-name {
   flex: 1;
   font-size: 30rpx;
-  color: var(--neutral-900);
+  color: #1D2129;
 }
 
 .func-value {
   font-size: 26rpx;
-  color: var(--neutral-500);
-  margin-right: var(--space-sm);
+  color: #86909C;
+  margin-right: 16rpx;
 }
 
 .func-arrow {
   font-size: 36rpx;
-  color: var(--neutral-400);
+  color: #A9AEB8;
 }
 
 /* Switch样式 */
@@ -188,8 +188,8 @@
 
 /* 危险操作区 */
 .danger-zone {
-  margin-top: var(--space-lg);
-  margin-bottom: var(--space-md);
+  margin-top: 32rpx;
+  margin-bottom: 24rpx;
 }
 
 .btn-danger {
@@ -197,10 +197,10 @@
   height: 88rpx;
   line-height: 88rpx;
   background: transparent;
-  border: 2rpx solid var(--error-600);
-  color: var(--error-600);
+  border: 2rpx solid #F53F3F;
+  color: #F53F3F;
   font-size: 30rpx;
-  border-radius: var(--radius-sm);
+  border-radius: 8rpx;
 }
 
 .btn-danger::after {
@@ -208,33 +208,33 @@
 }
 
 .btn-danger:active {
-  background: var(--error-100);
+  background: #FFECE8;
 }
 
 /* 底部信息 */
 .footer {
   text-align: center;
-  padding: var(--space-md) 0;
+  padding: 24rpx 0;
 }
 
 .footer-links {
   font-size: 26rpx;
-  color: var(--primary-600);
-  margin-bottom: var(--space-xs);
+  color: #1677FF;
+  margin-bottom: 8rpx;
   display: block;
 }
 
 .footer-links text {
-  margin: 0 var(--space-xs);
+  margin: 0 8rpx;
 }
 
 .footer-links .divider {
-  color: var(--neutral-300);
+  color: #C9CDD4;
 }
 
 .footer-copyright {
   font-size: 22rpx;
-  color: var(--neutral-400);
+  color: #A9AEB8;
 }
 
 /* 弹窗 */
@@ -261,9 +261,9 @@
 .modal-content {
   width: 100%;
   max-height: 80vh;
-  background: var(--neutral-0);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding: var(--space-md);
+  background: #FFFFFF;
+  border-radius: 16rpx 16rpx 0 0;
+  padding: 24rpx;
   transform: translateY(100%);
   transition: transform 300ms ease;
 }
@@ -276,33 +276,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-md);
+  margin-bottom: 24rpx;
 }
 
 .modal-title {
   font-size: 36rpx;
   font-weight: 600;
-  color: var(--neutral-900);
+  color: #1D2129;
 }
 
 .modal-close {
   font-size: 48rpx;
-  color: var(--neutral-400);
-  padding: 0 var(--space-sm);
+  color: #A9AEB8;
+  padding: 0 16rpx;
 }
 
 /* 字体选项 */
 .font-options {
-  padding-bottom: var(--space-md);
+  padding-bottom: 24rpx;
 }
 
 .font-option {
   display: flex;
   align-items: center;
-  padding: var(--space-md);
-  background: var(--neutral-100);
-  border-radius: var(--radius-sm);
-  margin-bottom: var(--space-sm);
+  padding: 24rpx;
+  background: #F5F7FA;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
   transition: all 200ms ease;
 }
 
@@ -311,14 +311,14 @@
 }
 
 .font-active {
-  background: var(--primary-100);
-  border: 2rpx solid var(--primary-600);
+  background: #E6F4FF;
+  border: 2rpx solid #1677FF;
 }
 
 .font-preview {
   font-weight: 600;
-  color: var(--neutral-900);
-  margin-right: var(--space-md);
+  color: #1D2129;
+  margin-right: 24rpx;
   width: 80rpx;
   text-align: center;
 }
@@ -326,18 +326,18 @@
 .font-label {
   flex: 1;
   font-size: 30rpx;
-  color: var(--neutral-700);
+  color: #4E5969;
 }
 
 .check-icon {
   width: 48rpx;
   height: 48rpx;
-  background: var(--primary-600);
-  border-radius: var(--radius-full);
+  background: #1677FF;
+  border-radius: 9999rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--neutral-0);
+  color: #FFFFFF;
   font-size: 28rpx;
   font-weight: 600;
 }

@@ -31,6 +31,7 @@ page {
   --neutral-200: #E5E6EB;
   --neutral-100: #F5F7FA;
   --neutral-0: #FFFFFF;
+  --neutral-50: #F9FAFB;
   
   /* 投影 */
   --shadow-sm: 0 2rpx 8rpx rgba(29, 33, 41, 0.08);
@@ -698,7 +699,7 @@ page {
 }
 
 .list-item:hover {
-  background-color: var(--neutral-50);
+  background-color: rgba(245, 247, 250, 0.8);
 }
 
 .list-item:active {

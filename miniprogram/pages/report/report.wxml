@@ -56,14 +56,16 @@
     </view>
   </view>
 
-  <!-- 占比饼图 -->
+  <!-- 支出占比饼图 -->
   <view class="chart-section card">
     <view class="chart-header">
       <text class="section-title">支出占比</text>
     </view>
-    <view class="pie-chart-container">
+    
+    <!-- 有数据时显示饼图 -->
+    <view wx:if="{{categoryStats.length > 0}}" class="pie-chart-container">
       <canvas type="2d" id="pieChart" class="pie-chart"></canvas>
-      <view class="pie-legend" wx:if="{{categoryStats.length > 0}}">
+      <view class="pie-legend">
         <view wx:for="{{categoryStats}}" wx:key="name" class="pie-legend-item">
           <view class="legend-color" style="background: {{item.color}};"></view>
           <view class="legend-info">
@@ -73,6 +75,16 @@
           <text class="legend-amount">{{item.amount}}</text>
         </view>
       </view>
+    </view>
+    
+    <!-- 无数据时显示空状态 -->
+    <view wx:if="{{categoryStats.length === 0}}" class="pie-empty-state">
+      <text class="pie-empty-icon">🍩</text>
+      <text class="pie-empty-title">暂无支出数据</text>
+      <text class="pie-empty-desc">该时间段内没有支出记录</text>
+      <button class="btn btn-primary" style="margin-top: 24rpx; width: 240rpx;" bindtap="goAdd">
+        记一笔
+      </button>
     </view>
   </view>
 

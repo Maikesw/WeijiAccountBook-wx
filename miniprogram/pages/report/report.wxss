@@ -78,7 +78,9 @@
 .summary-value {
   font-size: 32rpx;
   font-weight: 700;
-  display: block;
+  display: inline-block;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .summary-value::before {
@@ -86,6 +88,7 @@
   font-size: 24rpx;
   font-weight: 500;
   margin-right: 2rpx;
+  white-space: nowrap;
 }
 
 .income-card .summary-value {
@@ -198,6 +201,33 @@
   font-size: 28rpx;
   font-weight: 600;
   color: var(--neutral-900);
+}
+
+/* 饼图空状态 */
+.pie-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 40rpx;
+}
+
+.pie-empty-icon {
+  font-size: 96rpx;
+  margin-bottom: var(--space-sm);
+}
+
+.pie-empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--neutral-700);
+  margin-bottom: var(--space-xs);
+}
+
+.pie-empty-desc {
+  font-size: 26rpx;
+  color: var(--neutral-500);
+  margin-bottom: var(--space-sm);
 }
 
 /* 明细区 */

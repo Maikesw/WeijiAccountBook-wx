@@ -1,0 +1,579 @@
+@import "../../app.wxss";
+
+/* 页面样式 */
+.page-container {
+  padding: 24rpx;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #F5F7FA 0%, #FFFFFF 100%);
+}
+
+.page-header {
+  padding: 32rpx 0;
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1D2129;
+  letter-spacing: -1rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #86909C;
+  margin-top: 8rpx;
+}
+
+/* 总览卡片 */
+.summary-card {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.06);
+}
+
+.summary-item {
+  text-align: center;
+  flex: 1;
+}
+
+.summary-label {
+  display: block;
+  font-size: 24rpx;
+  color: #86909C;
+  margin-bottom: 8rpx;
+}
+
+.summary-value {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1D2129;
+}
+
+.summary-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: #E5E6EB;
+}
+
+/* 区块样式 */
+.section-block {
+  margin-top: 24rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1D2129;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  background: #1677FF;
+  border-radius: 32rpx;
+  transition: all 200ms ease;
+}
+
+.add-btn:active {
+  transform: scale(0.95);
+}
+
+.add-icon {
+  color: #FFFFFF;
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.add-text {
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+/* 目标卡片 */
+.goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.goal-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 
+    0 4rpx 12rpx rgba(0,0,0,0.06),
+    0 8rpx 24rpx rgba(0,0,0,0.04);
+  transition: all 200ms ease;
+}
+
+.goal-card:active {
+  transform: scale(0.98);
+}
+
+.goal-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.goal-icon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+}
+
+.goal-info {
+  flex: 1;
+}
+
+.goal-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1D2129;
+}
+
+.goal-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #86909C;
+  margin-top: 4rpx;
+}
+
+.goal-menu {
+  padding: 16rpx;
+}
+
+.menu-icon {
+  font-size: 40rpx;
+  color: #86909C;
+  font-weight: bold;
+}
+
+/* 进度区域 */
+.goal-progress-section {
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.progress-percent {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1677FF;
+}
+
+.progress-amount {
+  font-size: 26rpx;
+  color: #86909C;
+}
+
+.progress-bar {
+  height: 12rpx;
+  background: #E5E6EB;
+  border-radius: 6rpx;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1677FF 0%, #448EFF 100%);
+  border-radius: 6rpx;
+  transition: width 500ms ease;
+}
+
+.progress-fill.success {
+  background: linear-gradient(90deg, #00B42A 0%, #4CD658 100%);
+}
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+}
+
+.meta-left, .meta-right {
+  font-size: 22rpx;
+  color: #86909C;
+}
+
+.meta-right {
+  color: #1677FF;
+}
+
+/* 快捷操作 */
+.goal-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  border: none;
+  font-size: 26rpx;
+  font-weight: 500;
+  padding: 0;
+}
+
+.action-btn::after {
+  display: none;
+}
+
+.save-btn {
+  background: #1677FF;
+  color: #FFFFFF;
+}
+
+.record-btn {
+  background: #F2F3F5;
+  color: #4E5969;
+}
+
+.btn-icon {
+  margin-right: 8rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1D2129;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #86909C;
+  text-align: center;
+}
+
+/* 弹窗样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 200ms ease;
+  z-index: 1000;
+}
+
+.modal-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 32rpx;
+  transform: translateY(100%);
+  transition: transform 300ms ease;
+}
+
+.modal-show .modal-content {
+  transform: translateY(0);
+}
+
+.modal-lg {
+  max-height: 85vh;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1D2129;
+}
+
+.modal-close {
+  font-size: 48rpx;
+  color: #86909C;
+  padding: 8rpx;
+  line-height: 1;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #E5E6EB;
+}
+
+.modal-footer .btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 表单样式 */
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1D2129;
+  margin-bottom: 16rpx;
+}
+
+.form-input, .form-textarea {
+  height: 88rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  color: #1D2129;
+}
+
+.form-textarea {
+  height: 160rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.amount-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+}
+
+.currency {
+  font-size: 36rpx;
+  color: #86909C;
+  margin-right: 16rpx;
+}
+
+.amount-input-wrap .form-input {
+  flex: 1;
+  background: transparent;
+  padding: 0;
+}
+
+.amount-lg {
+  height: 100rpx;
+  font-size: 48rpx;
+  font-weight: 600;
+}
+
+/* 图标选择器 */
+.icon-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.icon-option {
+  width: 88rpx;
+  height: 88rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+}
+
+.icon-option:active {
+  transform: scale(0.9);
+}
+
+.icon-active {
+  background: #E8F4FF;
+  box-shadow: 0 0 0 3rpx #1677FF;
+}
+
+/* 快捷金额 */
+.quick-amounts {
+  display: flex;
+  gap: 16rpx;
+  margin: 24rpx 0;
+  flex-wrap: wrap;
+}
+
+.quick-tag {
+  padding: 12rpx 32rpx;
+  background: #F2F3F5;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  color: #4E5969;
+  transition: all 150ms ease;
+}
+
+.quick-tag:active {
+  transform: scale(0.95);
+}
+
+.quick-active {
+  background: #1677FF;
+  color: #FFFFFF;
+}
+
+/* 存入预览 */
+.selected-goal-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.preview-icon {
+  font-size: 48rpx;
+  margin-right: 16rpx;
+}
+
+.preview-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1D2129;
+}
+
+/* 记录列表 */
+.records-summary {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.summary-icon {
+  font-size: 56rpx;
+  margin-right: 20rpx;
+}
+
+.summary-info {
+  flex: 1;
+}
+
+.summary-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1D2129;
+}
+
+.summary-amount {
+  display: block;
+  font-size: 24rpx;
+  color: #1677FF;
+  margin-top: 4rpx;
+}
+
+.records-list {
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  padding: 16rpx;
+}
+
+.record-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #E5E6EB;
+}
+
+.record-item:last-child {
+  border-bottom: none;
+}
+
+.record-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.record-amount {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #00B42A;
+}
+
+.record-remark {
+  font-size: 22rpx;
+  color: #86909C;
+  margin-top: 4rpx;
+}
+
+.record-date {
+  font-size: 24rpx;
+  color: #86909C;
+}
+
+.records-empty {
+  padding: 60rpx;
+  text-align: center;
+  color: #86909C;
+  font-size: 26rpx;
+}

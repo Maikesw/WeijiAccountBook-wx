@@ -1,7 +1,11 @@
-// 统计页 - 优化按钮交互版本
-const expenseService = require('../../services/expenseService')
-const { formatDate, formatAmount, getDaysInMonth } = require('../../utils/util')
-const feedback = require('../../utils/feedback')
+// 统计页 - ES5版本
+var expenseService = require('../../services/expenseService')
+var util = require('../../utils/util')
+var feedback = require('../../utils/feedback')
+
+var formatDate = util.formatDate
+var formatAmount = util.formatAmount
+var getDaysInMonth = util.getDaysInMonth
 
 Page({
   data: {
@@ -39,20 +43,20 @@ Page({
   // 配色方案
   colors: ['#1677FF', '#00B42A', '#F53F3F', '#FF7D00', '#722ED1', '#14C9C9', '#F7BA1E', '#86909C'],
 
-  onLoad() {
-    const now = new Date()
+  onLoad: function() {
+    var now = new Date()
     this.setData({
       currentDate: formatDate(now, 'YYYY-MM')
     })
     this.loadData()
   },
 
-  onShow() {
+  onShow: function() {
     this.loadData()
   },
 
   // 加载所有数据
-  loadData() {
+  loadData: function() {
     this.loadStats()
     this.loadCategoryStats()
     this.loadDetailList(true)
@@ -60,17 +64,19 @@ Page({
   },
 
   // 加载统计数据
-  loadStats() {
-    const { currentTimeTab, currentYear, currentMonth } = this.data
-    let expenses = []
+  loadStats: function() {
+    var currentTimeTab = this.data.currentTimeTab
+    var currentYear = this.data.currentYear
+    var currentMonth = this.data.currentMonth
+    var expenses = []
     
     if (currentTimeTab === 'month') {
       expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
     } else if (currentTimeTab === 'year') {
-      const allExpenses = expenseService.getLocalExpenses()
+      var allExpenses = expenseService.getLocalExpenses()
       expenses = []
-      for (let i = 0; i < allExpenses.length; i++) {
-        const date = new Date(allExpenses[i].spentAt)
+      for (var i = 0; i < allExpenses.length; i++) {
+        var date = new Date(allExpenses[i].spentAt)
         if (date.getFullYear() === currentYear) {
           expenses.push(allExpenses[i])
         }
@@ -79,12 +85,13 @@ Page({
       expenses = expenseService.getLocalExpenses()
     }
     
-    let income = 0, expense = 0
-    for (let i = 0; i < expenses.length; i++) {
-      if (expenses[i].type === 'income' || expenses[i].focus === '收入') {
-        income += expenses[i].amount
+    var income = 0
+    var expense = 0
+    for (var j = 0; j < expenses.length; j++) {
+      if (expenses[j].type === 'income' || expenses[j].focus === '收入') {
+        income += expenses[j].amount
       } else {
-        expense += expenses[i].amount
+        expense += expenses[j].amount
       }
     }
     
@@ -99,9 +106,11 @@ Page({
   },
 
   // 加载分类统计
-  loadCategoryStats() {
-    const { currentTimeTab, currentYear, currentMonth } = this.data
-    let expenses = []
+  loadCategoryStats: function() {
+    var currentTimeTab = this.data.currentTimeTab
+    var currentYear = this.data.currentYear
+    var currentMonth = this.data.currentMonth
+    var expenses = []
     
     if (currentTimeTab === 'month') {
       expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
@@ -110,12 +119,12 @@ Page({
     }
     
     // 按分类汇总
-    const categoryMap = {}
-    for (let i = 0; i < expenses.length; i++) {
-      const item = expenses[i]
+    var categoryMap = {}
+    for (var i = 0; i < expenses.length; i++) {
+      var item = expenses[i]
       if (item.type === 'income') continue
       
-      const category = item.focus || (item.tags && item.tags[0]) || '其他'
+      var category = item.focus || (item.tags && item.tags[0]) || '其他'
       if (!categoryMap[category]) {
         categoryMap[category] = 0
       }
@@ -123,23 +132,27 @@ Page({
     }
     
     // 转换为数组并排序
-    let total = 0
-    for (let key in categoryMap) {
-      total += categoryMap[key]
+    var total = 0
+    for (var key in categoryMap) {
+      if (categoryMap.hasOwnProperty(key)) {
+        total += categoryMap[key]
+      }
     }
     
-    const stats = []
-    let index = 0
-    for (let name in categoryMap) {
-      const amount = categoryMap[name]
-      stats.push({
-        name: name,
-        amount: formatAmount(amount),
-        value: amount,
-        percent: total > 0 ? Math.round((amount / total) * 100) : 0,
-        color: this.colors[index % this.colors.length]
-      })
-      index++
+    var stats = []
+    var index = 0
+    for (var name in categoryMap) {
+      if (categoryMap.hasOwnProperty(name)) {
+        var amount = categoryMap[name]
+        stats.push({
+          name: name,
+          amount: formatAmount(amount),
+          value: amount,
+          percent: total > 0 ? Math.round((amount / total) * 100) : 0,
+          color: this.colors[index % this.colors.length]
+        })
+        index++
+      }
     }
     
     stats.sort(function(a, b) { return b.value - a.value })
@@ -149,21 +162,24 @@ Page({
   },
 
   // 加载明细列表
-  loadDetailList(reset) {
+  loadDetailList: function(reset) {
     if (reset) {
       this.setData({ currentPage: 1, detailList: [] })
     }
     
-    const { currentTimeTab, currentYear, currentMonth, pageSize, currentPage } = this.data
-    let expenses = []
+    var currentTimeTab = this.data.currentTimeTab
+    var currentYear = this.data.currentYear
+    var currentMonth = this.data.currentMonth
+    var pageSize = this.data.pageSize
+    var currentPage = this.data.currentPage
+    var expenses = []
     
     if (currentTimeTab === 'month') {
       expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
     } else if (currentTimeTab === 'year') {
-      const allExpenses = expenseService.getLocalExpenses()
-      expenses = []
-      for (let i = 0; i < allExpenses.length; i++) {
-        const date = new Date(allExpenses[i].spentAt)
+      var allExpenses = expenseService.getLocalExpenses()
+      for (var i = 0; i < allExpenses.length; i++) {
+        var date = new Date(allExpenses[i].spentAt)
         if (date.getFullYear() === currentYear) {
           expenses.push(allExpenses[i])
         }
@@ -173,16 +189,16 @@ Page({
     }
     
     // 分页
-    const start = (currentPage - 1) * pageSize
-    const end = start + pageSize
-    const pageData = expenses.slice(start, end)
+    var start = (currentPage - 1) * pageSize
+    var end = start + pageSize
+    var pageData = expenses.slice(start, end)
     
-    const formatted = []
-    for (let i = 0; i < pageData.length; i++) {
-      formatted.push(this.formatDetailItem(pageData[i]))
+    var formatted = []
+    for (var j = 0; j < pageData.length; j++) {
+      formatted.push(this.formatDetailItem(pageData[j]))
     }
     
-    const newDetailList = reset ? formatted : this.data.detailList.concat(formatted)
+    var newDetailList = reset ? formatted : this.data.detailList.concat(formatted)
     
     this.setData({
       detailList: newDetailList,
@@ -192,26 +208,26 @@ Page({
   },
 
   // 格式化明细项
-  formatDetailItem(item) {
-    const categoryIcons = {
+  formatDetailItem: function(item) {
+    var categoryIcons = {
       '餐饮': '🍔', '交通': '🚇', '房租': '🏠', '购物': '🛍️',
       '娱乐': '🎮', '医疗': '💊', '教育': '📚', '工资': '💰',
       '理财': '📈', '其他': '📦'
     }
     
-    const categoryColors = {
+    var categoryColors = {
       '餐饮': '#FFF7E8', '交通': '#E6F4FF', '房租': '#F0F5FF',
       '购物': '#FFECE8', '娱乐': '#F5F0FF', '医疗': '#FFF0F0',
       '教育': '#F0FFF0', '工资': '#E8FFEA', '理财': '#FFF7E8'
     }
     
-    const category = item.focus || (item.tags && item.tags[0]) || '其他'
-    const date = new Date(item.spentAt)
-    const today = new Date()
-    const yesterday = new Date(today)
+    var category = item.focus || (item.tags && item.tags[0]) || '其他'
+    var date = new Date(item.spentAt)
+    var today = new Date()
+    var yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
     
-    let displayDate = ''
+    var displayDate = ''
     if (date.toDateString() === today.toDateString()) {
       displayDate = '今天 ' + formatDate(date, 'HH:mm')
     } else if (date.toDateString() === yesterday.toDateString()) {
@@ -220,7 +236,7 @@ Page({
       displayDate = formatDate(date, 'MM-DD HH:mm')
     }
     
-    const result = {
+    return {
       _id: item._id,
       event: item.event,
       amount: formatAmount(item.amount),
@@ -231,12 +247,11 @@ Page({
       type: item.type || (item.focus === '收入' ? 'income' : 'expense'),
       spentAt: item.spentAt
     }
-    return result
   },
 
   // 绘制图表
-  drawCharts() {
-    const that = this
+  drawCharts: function() {
+    var that = this
     setTimeout(function() {
       that.drawTrendChart()
       that.drawPieChart()
@@ -244,41 +259,42 @@ Page({
   },
 
   // 绘制趋势图
-  drawTrendChart() {
-    const that = this
-    const query = wx.createSelectorQuery()
+  drawTrendChart: function() {
+    var that = this
+    var query = wx.createSelectorQuery()
     query.select('#trendChart').fields({ node: true, size: true }).exec(function(res) {
       if (!res[0]) return
       
-      const canvas = res[0].node
-      const ctx = canvas.getContext('2d')
-      const dpr = wx.getSystemInfoSync().pixelRatio
+      var canvas = res[0].node
+      var ctx = canvas.getContext('2d')
+      var dpr = wx.getSystemInfoSync().pixelRatio
       
       canvas.width = res[0].width * dpr
       canvas.height = res[0].height * dpr
       ctx.scale(dpr, dpr)
       
-      const width = res[0].width
-      const height = res[0].height
-      const padding = { top: 40, right: 20, bottom: 40, left: 60 }
+      var width = res[0].width
+      var height = res[0].height
+      var padding = { top: 40, right: 20, bottom: 40, left: 60 }
       
       // 清空画布
       ctx.clearRect(0, 0, width, height)
       
       // 获取数据
-      const { currentYear, currentMonth } = that.data
-      const days = getDaysInMonth(currentYear, currentMonth)
-      const expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
+      var currentYear = that.data.currentYear
+      var currentMonth = that.data.currentMonth
+      var days = getDaysInMonth(currentYear, currentMonth)
+      var expenses = expenseService.getExpensesByMonth(currentYear, currentMonth)
       
       // 按天汇总
-      const dailyData = {}
-      for (let i = 1; i <= days; i++) {
+      var dailyData = {}
+      for (var i = 1; i <= days; i++) {
         dailyData[i] = { income: 0, expense: 0 }
       }
       
-      for (let i = 0; i < expenses.length; i++) {
-        const item = expenses[i]
-        const day = new Date(item.spentAt).getDate()
+      for (var j = 0; j < expenses.length; j++) {
+        var item = expenses[j]
+        var day = new Date(item.spentAt).getDate()
         if (item.type === 'income') {
           dailyData[day].income += item.amount
         } else {
@@ -286,26 +302,28 @@ Page({
         }
       }
       
-      const dataPoints = []
-      for (let day in dailyData) {
-        dataPoints.push({
-          day: parseInt(day),
-          income: dailyData[day].income,
-          expense: dailyData[day].expense
-        })
+      var dataPoints = []
+      for (var day in dailyData) {
+        if (dailyData.hasOwnProperty(day)) {
+          dataPoints.push({
+            day: parseInt(day),
+            income: dailyData[day].income,
+            expense: dailyData[day].expense
+          })
+        }
       }
       
       // 计算最大值
-      let maxValue = 100
-      for (let i = 0; i < dataPoints.length; i++) {
-        const maxOfDay = Math.max(dataPoints[i].income, dataPoints[i].expense)
+      var maxValue = 100
+      for (var k = 0; k < dataPoints.length; k++) {
+        var maxOfDay = Math.max(dataPoints[k].income, dataPoints[k].expense)
         if (maxOfDay > maxValue) {
           maxValue = maxOfDay
         }
       }
       
-      const chartWidth = width - padding.left - padding.right
-      const chartHeight = height - padding.top - padding.bottom
+      var chartWidth = width - padding.left - padding.right
+      var chartHeight = height - padding.top - padding.bottom
       
       // 绘制坐标轴
       ctx.strokeStyle = '#E5E6EB'
@@ -317,8 +335,8 @@ Page({
       ctx.stroke()
       
       // 绘制网格线
-      for (let i = 0; i <= 4; i++) {
-        const y = padding.top + (chartHeight / 4) * i
+      for (var m = 0; m <= 4; m++) {
+        var y = padding.top + (chartHeight / 4) * m
         ctx.beginPath()
         ctx.moveTo(padding.left, y)
         ctx.lineTo(width - padding.right, y)
@@ -328,21 +346,21 @@ Page({
         ctx.fillStyle = '#86909C'
         ctx.font = '20rpx sans-serif'
         ctx.textAlign = 'right'
-        ctx.fillText((maxValue * (1 - i / 4)).toFixed(0), padding.left - 10, y + 6)
+        ctx.fillText((maxValue * (1 - m / 4)).toFixed(0), padding.left - 10, y + 6)
       }
       
       // 绘制折线
-      const drawLine = function(dataKey, color) {
+      var drawLine = function(dataKey, color) {
         ctx.strokeStyle = color
         ctx.lineWidth = 3
         ctx.beginPath()
         
-        for (let i = 0; i < dataPoints.length; i++) {
-          const point = dataPoints[i]
-          const x = padding.left + (chartWidth / (days - 1)) * i
-          const y = padding.top + chartHeight - (point[dataKey] / maxValue) * chartHeight
+        for (var n = 0; n < dataPoints.length; n++) {
+          var point = dataPoints[n]
+          var x = padding.left + (chartWidth / (days - 1)) * n
+          var y = padding.top + chartHeight - (point[dataKey] / maxValue) * chartHeight
           
-          if (i === 0) {
+          if (n === 0) {
             ctx.moveTo(x, y)
           } else {
             ctx.lineTo(x, y)
@@ -353,13 +371,13 @@ Page({
         
         // 绘制数据点
         ctx.fillStyle = color
-        for (let i = 0; i < dataPoints.length; i++) {
-          const point = dataPoints[i]
-          if (point[dataKey] > 0) {
-            const x = padding.left + (chartWidth / (days - 1)) * i
-            const y = padding.top + chartHeight - (point[dataKey] / maxValue) * chartHeight
+        for (var p = 0; p < dataPoints.length; p++) {
+          var pt = dataPoints[p]
+          if (pt[dataKey] > 0) {
+            var px = padding.left + (chartWidth / (days - 1)) * p
+            var py = padding.top + chartHeight - (pt[dataKey] / maxValue) * chartHeight
             ctx.beginPath()
-            ctx.arc(x, y, 4, 0, Math.PI * 2)
+            ctx.arc(px, py, 4, 0, Math.PI * 2)
             ctx.fill()
           }
         }
@@ -372,41 +390,41 @@ Page({
       ctx.fillStyle = '#86909C'
       ctx.font = '20rpx sans-serif'
       ctx.textAlign = 'center'
-      const labelInterval = Math.ceil(days / 6)
-      for (let i = 0; i < days; i += labelInterval) {
-        const x = padding.left + (chartWidth / (days - 1)) * i
-        ctx.fillText((i + 1) + '日', x, height - padding.bottom + 25)
+      var labelInterval = Math.ceil(days / 6)
+      for (var q = 0; q < days; q += labelInterval) {
+        var lx = padding.left + (chartWidth / (days - 1)) * q
+        ctx.fillText((q + 1) + '日', lx, height - padding.bottom + 25)
       }
     })
   },
 
   // 绘制饼图
-  drawPieChart() {
-    const { categoryStats } = this.data
+  drawPieChart: function() {
+    var categoryStats = this.data.categoryStats
     if (categoryStats.length === 0) return
 
-    const query = wx.createSelectorQuery()
+    var query = wx.createSelectorQuery()
     query.select('#pieChart').fields({ node: true, size: true }).exec(function(res) {
       if (!res[0]) return
       
-      const canvas = res[0].node
-      const ctx = canvas.getContext('2d')
-      const dpr = wx.getSystemInfoSync().pixelRatio
+      var canvas = res[0].node
+      var ctx = canvas.getContext('2d')
+      var dpr = wx.getSystemInfoSync().pixelRatio
       
       canvas.width = res[0].width * dpr
       canvas.height = res[0].height * dpr
       ctx.scale(dpr, dpr)
       
-      const centerX = res[0].width / 2
-      const centerY = res[0].height / 2
-      const radius = Math.min(centerX, centerY) - 30
-      const innerRadius = radius * 0.5
+      var centerX = res[0].width / 2
+      var centerY = res[0].height / 2
+      var radius = Math.min(centerX, centerY) - 30
+      var innerRadius = radius * 0.5
       
-      let currentAngle = -Math.PI / 2
+      var currentAngle = -Math.PI / 2
       
-      for (let i = 0; i < categoryStats.length; i++) {
-        const item = categoryStats[i]
-        const sliceAngle = (item.percent / 100) * Math.PI * 2
+      for (var i = 0; i < categoryStats.length; i++) {
+        var item = categoryStats[i]
+        var sliceAngle = (item.percent / 100) * Math.PI * 2
         
         // 绘制扇形
         ctx.beginPath()
@@ -418,9 +436,9 @@ Page({
         
         // 绘制百分比标签
         if (item.percent > 5) {
-          const labelAngle = currentAngle + sliceAngle / 2
-          const labelX = centerX + Math.cos(labelAngle) * (radius * 0.75)
-          const labelY = centerY + Math.sin(labelAngle) * (radius * 0.75)
+          var labelAngle = currentAngle + sliceAngle / 2
+          var labelX = centerX + Math.cos(labelAngle) * (radius * 0.75)
+          var labelY = centerY + Math.sin(labelAngle) * (radius * 0.75)
           
           ctx.fillStyle = '#FFFFFF'
           ctx.font = 'bold 22rpx sans-serif'
@@ -445,15 +463,17 @@ Page({
   },
 
   // 切换时间标签 - 带反馈
-  switchTimeTab(e) {
-    const tab = e.currentTarget.dataset.tab
-    feedback.switchFeedback(this, 'currentTimeTab', tab)
-    this.loadData()
+  switchTimeTab: function(e) {
+    var tab = e.currentTarget.dataset.tab
+    var that = this
+    feedback.switchFeedback(this, 'currentTimeTab', tab, function() {
+      that.loadData()
+    })
   },
 
   // 日期选择
-  onDateChange(e) {
-    const date = new Date(e.detail.value)
+  onDateChange: function(e) {
+    var date = new Date(e.detail.value)
     this.setData({
       currentDate: e.detail.value,
       currentYear: date.getFullYear(),
@@ -463,21 +483,22 @@ Page({
   },
 
   // 加载更多 - 带反馈
-  loadMore() {
+  loadMore: function() {
+    var that = this
     feedback.buttonVisual('light')
     this.setData({ loading: true })
     this.loadDetailList(false)
-    setTimeout(() => {
-      this.setData({ loading: false })
+    setTimeout(function() {
+      that.setData({ loading: false })
     }, 500)
   },
 
   // 查看详情 - 带反馈
-  viewDetail(e) {
+  viewDetail: function(e) {
     feedback.buttonVisual('light')
-    const id = e.currentTarget.dataset.id
-    const app = getApp()
-    const expense = expenseService.getExpenseById(id)
+    var id = e.currentTarget.dataset.id
+    var app = getApp()
+    var expense = expenseService.getExpenseById(id)
     
     if (expense) {
       app.globalData.isEditMode = true
@@ -487,7 +508,7 @@ Page({
   },
 
   // 去记账 - 带反馈
-  goAdd() {
+  goAdd: function() {
     feedback.buttonVisual('light')
     wx.switchTab({ url: '/pages/book/book' })
   }

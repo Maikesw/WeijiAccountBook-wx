@@ -4,7 +4,9 @@
     "pages/story/story",
     "pages/report/report",
     "pages/me/me",
-    "pages/expense/expense"
+    "pages/expense/expense",
+    "pages/goal/goal",
+    "pages/budget/budget"
   ],
   "window": {
     "backgroundTextStyle": "dark",

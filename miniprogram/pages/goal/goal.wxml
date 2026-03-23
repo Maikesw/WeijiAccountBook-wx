@@ -1,0 +1,225 @@
+<!-- 存钱目标页 -->
+<view class="page-container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">存钱目标</text>
+    <text class="page-subtitle">设定目标，积少成多</text>
+  </view>
+
+  <!-- 总览卡片 -->
+  <view class="summary-card">
+    <view class="summary-item">
+      <text class="summary-label">目标总数</text>
+      <text class="summary-value">{{goals.length}}</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-label">累计存入</text>
+      <text class="summary-value text-income">{{totalSaved}}</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-label">目标总额</text>
+      <text class="summary-value">{{totalTarget}}</text>
+    </view>
+  </view>
+
+  <!-- 目标列表 -->
+  <view class="section-block">
+    <view class="section-header">
+      <text class="section-title">我的目标</text>
+      <view class="add-btn" bindtap="showAddModal">
+        <text class="add-icon">+</text>
+        <text class="add-text">新建</text>
+      </view>
+    </view>
+
+    <view class="goal-list">
+      <view wx:for="{{goals}}" wx:key="id" class="goal-card" bindtap="showGoalDetail" data-id="{{item.id}}">
+        <!-- 目标图标和名称 -->
+        <view class="goal-header">
+          <view class="goal-icon" style="background: {{item.color}}20;">
+            <text style="font-size: 48rpx;">{{item.icon}}</text>
+          </view>
+          <view class="goal-info">
+            <text class="goal-name">{{item.name}}</text>
+            <text class="goal-desc">{{item.description || '坚持就是胜利'}}</text>
+          </view>
+          <view class="goal-menu" catchtap="showMenu" data-id="{{item.id}}">
+            <text class="menu-icon">⋯</text>
+          </view>
+        </view>
+
+        <!-- 进度展示 -->
+        <view class="goal-progress-section">
+          <view class="progress-info">
+            <text class="progress-percent">{{item.progress}}%</text>
+            <text class="progress-amount">{{item.saved}}/{{item.target}}</text>
+          </view>
+          <view class="progress-bar">
+            <view class="progress-fill {{item.progress >= 100 ? 'success' : ''}}" style="width: {{item.progress}}%;"></view>
+          </view>
+          <view class="progress-meta">
+            <text class="meta-left">已存 {{item.days}} 天</text>
+            <text class="meta-right">{{item.progress >= 100 ? '已完成' : '还需 ' + item.remaining}}</text>
+          </view>
+        </view>
+
+        <!-- 快捷操作 -->
+        <view class="goal-actions">
+          <button class="action-btn save-btn" catchtap="showSaveModal" data-id="{{item.id}}">
+            <text class="btn-icon">+</text>
+            <text class="btn-text">存入</text>
+          </button>
+          <button class="action-btn record-btn" catchtap="viewRecords" data-id="{{item.id}}">
+            <text class="btn-icon">📋</text>
+            <text class="btn-text">记录</text>
+          </button>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view wx:if="{{goals.length === 0}}" class="empty-state">
+        <text class="empty-icon">🎯</text>
+        <text class="empty-title">还没有存钱目标</text>
+        <text class="empty-desc">设定一个小目标，开始存钱之旅</text>
+        <button class="btn btn-primary btn-core" style="margin-top: 32rpx; width: 400rpx;" bindtap="showAddModal">
+          创建第一个目标
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view style="height: 40rpx;"></view>
+</view>
+
+<!-- 新建目标弹窗 -->
+<view class="modal {{showAddGoal ? 'modal-show' : ''}}" bindtap="hideAddModal">
+  <view class="modal-content modal-lg" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">新建存钱目标</text>
+      <text class="modal-close" bindtap="hideAddModal">×</text>
+    </view>
+    
+    <view class="modal-body">
+      <!-- 图标选择 -->
+      <view class="form-item">
+        <text class="form-label">选择图标</text>
+        <view class="icon-selector">
+          <view wx:for="{{iconOptions}}" wx:key="*this" 
+                class="icon-option {{newGoal.icon === item ? 'icon-active' : ''}}"
+                bindtap="selectIcon" data-icon="{{item}}">
+            <text style="font-size: 48rpx;">{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 目标名称 -->
+      <view class="form-item">
+        <text class="form-label">目标名称</text>
+        <input class="form-input" placeholder="例如：买新手机" value="{{newGoal.name}}" bindinput="onNameInput"/>
+      </view>
+
+      <!-- 目标金额 -->
+      <view class="form-item">
+        <text class="form-label">目标金额</text>
+        <view class="amount-input-wrap">
+          <text class="currency">¥</text>
+          <input class="form-input" type="digit" placeholder="0.00" value="{{newGoal.target}}" bindinput="onTargetInput"/>
+        </view>
+      </view>
+
+      <!-- 描述 -->
+      <view class="form-item">
+        <text class="form-label">目标描述（选填）</text>
+        <textarea class="form-textarea" placeholder="写下你的存钱动力..." value="{{newGoal.description}}" bindinput="onDescInput"/>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideAddModal">取消</button>
+      <button class="btn btn-primary {{!canAddGoal ? 'btn-disabled' : ''}}" bindtap="addGoal">创建目标</button>
+    </view>
+  </view>
+</view>
+
+<!-- 存入弹窗 -->
+<view class="modal {{showSaveMoney ? 'modal-show' : ''}}" bindtap="hideSaveModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">存入金额</text>
+      <text class="modal-close" bindtap="hideSaveModal">×</text>
+    </view>
+    
+    <view class="modal-body">
+      <view class="selected-goal-preview" wx:if="{{selectedGoal}}">
+        <text class="preview-icon">{{selectedGoal.icon}}</text>
+        <text class="preview-name">{{selectedGoal.name}}</text>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">存入金额</text>
+        <view class="amount-input-wrap">
+          <text class="currency">¥</text>
+          <input class="form-input amount-lg" type="digit" placeholder="0.00" value="{{saveAmount}}" bindinput="onSaveAmountInput" focus="{{true}}"/>
+        </view>
+      </view>
+
+      <!-- 快捷金额 -->
+      <view class="quick-amounts">
+        <text wx:for="{{[10, 50, 100, 500, 1000]}}" wx:key="*this" 
+              class="quick-tag {{saveAmount == item ? 'quick-active' : ''}}"
+              bindtap="setQuickSave" data-amount="{{item}}">{{item}}</text>
+      </view>
+
+      <!-- 备注 -->
+      <view class="form-item">
+        <text class="form-label">备注（选填）</text>
+        <input class="form-input" placeholder="例如：工资结余" value="{{saveRemark}}" bindinput="onSaveRemarkInput"/>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideSaveModal">取消</button>
+      <button class="btn btn-primary {{!canSave ? 'btn-disabled' : ''}}" bindtap="saveMoney">确认存入</button>
+    </view>
+  </view>
+</view>
+
+<!-- 记录弹窗 -->
+<view class="modal {{showRecords ? 'modal-show' : ''}}" bindtap="hideRecordsModal">
+  <view class="modal-content modal-lg" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">存入记录</text>
+      <text class="modal-close" bindtap="hideRecordsModal">×</text>
+    </view>
+    
+    <view class="modal-body">
+      <view class="records-summary" wx:if="{{recordGoal}}">
+        <view class="summary-icon">{{recordGoal.icon}}</view>
+        <view class="summary-info">
+          <text class="summary-name">{{recordGoal.name}}</text>
+          <text class="summary-amount">累计存入 {{recordGoal.saved}}</text>
+        </view>
+      </view>
+
+      <scroll-view scroll-y class="records-list" style="max-height: 600rpx;">
+        <view wx:for="{{records}}" wx:key="date" class="record-item">
+          <view class="record-left">
+            <text class="record-amount">+{{item.amount}}</text>
+            <text class="record-remark" wx:if="{{item.remark}}">{{item.remark}}</text>
+          </view>
+          <text class="record-date">{{item.date}}</text>
+        </view>
+        <view wx:if="{{records.length === 0}}" class="records-empty">
+          <text>暂无存入记录</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn btn-primary" bindtap="hideRecordsModal">关闭</button>
+    </view>
+  </view>
+</view>

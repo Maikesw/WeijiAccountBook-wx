@@ -1,0 +1,166 @@
+<!-- 预算管理页 -->
+<view class="page-container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">预算管理</text>
+    <text class="page-subtitle">合理规划，理性消费</text>
+  </view>
+
+  <!-- 月度总览 -->
+  <view class="overview-card">
+    <view class="overview-header">
+      <text class="overview-month">{{currentMonth}}</text>
+      <text class="overview-status {{budgetStatus}}">{{budgetStatusText}}</text>
+    </view>
+    
+    <view class="budget-circle-wrap">
+      <view class="budget-circle">
+        <view class="circle-inner">
+          <text class="circle-label">剩余预算</text>
+          <text class="circle-amount {{remainingClass}}">{{remainingBudget}}</text>
+          <text class="circle-total">总预算 {{totalBudget}}</text>
+        </view>
+        <view class="progress-ring">
+          <view class="ring-bg"></view>
+          <view class="ring-fill" style="background: conic-gradient({{ringColor}} {{usedPercent}}%, transparent {{usedPercent}}%);"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="overview-stats">
+      <view class="stat-item">
+        <text class="stat-value text-expense">{{spentAmount}}</text>
+        <text class="stat-label">已支出</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{dailyBudget}}</text>
+        <text class="stat-label">日均可用</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{daysLeft}}天</text>
+        <text class="stat-label">剩余天数</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类预算 -->
+  <view class="section-block">
+    <view class="section-header">
+      <text class="section-title">分类预算</text>
+      <view class="add-btn" bindtap="showAddModal">
+        <text class="add-icon">+</text>
+        <text class="add-text">设置</text>
+      </view>
+    </view>
+
+    <view class="budget-list">
+      <view wx:for="{{categoryBudgets}}" wx:key="category" class="budget-item">
+        <view class="budget-icon" style="background: {{item.color}}20;">
+          <text style="font-size: 40rpx; color: {{item.color}};">{{item.icon}}</text>
+        </view>
+        <view class="budget-info">
+          <view class="budget-top">
+            <text class="budget-name">{{item.name}}</text>
+            <text class="budget-numbers">{{item.spent}}/{{item.budget}}</text>
+          </view>
+          <view class="progress-wrap">
+            <view class="progress-track">
+              <view class="progress-fill {{item.status}}" style="width: {{item.percent}}%;"></view>
+            </view>
+            <text class="progress-text">{{item.percent}}%</text>
+          </view>
+          <view class="budget-meta">
+            <text class="meta-text">{{item.remaining >= 0 ? '剩余 ' + item.remainingText : '超支 ' + item.overText}}</text>
+            <text class="meta-percent {{item.status}}">{{item.percent}}%</text>
+          </view>
+        </view>
+        <view class="budget-menu" catchtap="editBudget" data-item="{{item}}">
+          <text class="menu-icon">⋯</text>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view wx:if="{{categoryBudgets.length === 0}}" class="empty-state">
+        <text class="empty-icon">📊</text>
+        <text class="empty-title">还没有分类预算</text>
+        <text class="empty-desc">为不同消费类别设置预算，控制支出</text>
+        <button class="btn btn-primary btn-core" style="margin-top: 32rpx; width: 400rpx;" bindtap="showAddModal">
+          设置预算
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 支出趋势 -->
+  <view class="section-block" wx:if="{{trendData.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">支出趋势</text>
+    </view>
+    <view class="trend-chart">
+      <view wx:for="{{trendData}}" wx:key="date" class="trend-item">
+        <view class="trend-bar-wrap">
+          <view class="trend-bar {{item.isToday ? 'today' : ''}}" style="height: {{item.height}}%;"></view>
+        </view>
+        <text class="trend-date">{{item.label}}</text>
+        <text class="trend-amount" wx:if="{{item.isToday}}">{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view style="height: 40rpx;"></view>
+</view>
+
+<!-- 设置预算弹窗 -->
+<view class="modal {{showBudgetModal ? 'modal-show' : ''}}" bindtap="hideModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">设置分类预算</text>
+      <text class="modal-close" bindtap="hideModal">×</text>
+    </view>
+    
+    <view class="modal-body">
+      <!-- 分类选择 -->
+      <view class="form-item">
+        <text class="form-label">选择分类</text>
+        <view class="category-selector">
+          <view wx:for="{{expenseCategories}}" wx:key="id" 
+                class="category-option {{selectedCategory === item.id ? 'category-active' : ''}}"
+                bindtap="selectCategory" data-id="{{item.id}}">
+            <text class="category-icon">{{item.icon}}</text>
+            <text class="category-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 预算金额 -->
+      <view class="form-item">
+        <text class="form-label">预算金额</text>
+        <view class="amount-input-wrap">
+          <text class="currency">¥</text>
+          <input class="form-input amount-lg" type="digit" placeholder="0.00" value="{{budgetAmount}}" bindinput="onAmountInput"/>
+        </view>
+      </view>
+
+      <!-- 快捷金额 -->
+      <view class="quick-amounts">
+        <text wx:for="{{[500, 1000, 2000, 3000, 5000]}}" wx:key="*this" 
+              class="quick-tag {{budgetAmount == item ? 'quick-active' : ''}}"
+              bindtap="setQuickAmount" data-amount="{{item}}">{{item}}</text>
+      </view>
+
+      <!-- 提示 -->
+      <view class="budget-tip">
+        <text class="tip-icon">💡</text>
+        <text class="tip-text">建议设置月支出的80%作为预算，预留缓冲空间</text>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideModal">取消</button>
+      <button class="btn btn-primary {{!canSave ? 'btn-disabled' : ''}}" bindtap="saveBudget">保存</button>
+    </view>
+  </view>
+</view>

@@ -1,7 +1,7 @@
-// 个人中心 - 优化按钮交互版本
-const expenseService = require('../../services/expenseService')
-const { showToast, formatAmount } = require('../../utils/util')
-const feedback = require('../../utils/feedback')
+// 个人中心 - ES5版本
+var expenseService = require('../../services/expenseService')
+var util = require('../../utils/util')
+var feedback = require('../../utils/feedback')
 
 Page({
   data: {
@@ -31,38 +31,38 @@ Page({
     ]
   },
 
-  onLoad() {
+  onLoad: function() {
     this.loadUserInfo()
     this.loadUserStats()
     this.loadSettings()
     this.calculateCache()
   },
 
-  onShow() {
+  onShow: function() {
     this.loadUserStats()
   },
 
   // 加载用户信息
-  loadUserInfo() {
-    const userInfo = wx.getStorageSync('userInfo') || {}
-    this.setData({ userInfo })
+  loadUserInfo: function() {
+    var userInfo = wx.getStorageSync('userInfo') || {}
+    this.setData({ userInfo: userInfo })
   },
 
   // 加载用户统计
-  loadUserStats() {
-    const expenses = expenseService.getLocalExpenses()
-    const stories = expenseService.getExpensesWithStory()
+  loadUserStats: function() {
+    var expenses = expenseService.getLocalExpenses()
+    var stories = expenseService.getExpensesWithStory()
     
     // 计算记账天数
-    const dates = {}
-    for (let i = 0; i < expenses.length; i++) {
-      const date = new Date(expenses[i].createdAt || expenses[i].spentAt).toDateString()
+    var dates = {}
+    for (var i = 0; i < expenses.length; i++) {
+      var date = new Date(expenses[i].createdAt || expenses[i].spentAt).toDateString()
       dates[date] = true
     }
     
     // 计算对象keys数量
-    let daysCount = 0
-    for (let key in dates) {
+    var daysCount = 0
+    for (var key in dates) {
       if (dates.hasOwnProperty(key)) {
         daysCount++
       }
@@ -76,8 +76,8 @@ Page({
   },
 
   // 加载设置
-  loadSettings() {
-    const settings = wx.getStorageSync('appSettings') || {}
+  loadSettings: function() {
+    var settings = wx.getStorageSync('appSettings') || {}
     this.setData({
       darkMode: settings.darkMode || false,
       fontSize: settings.fontSize || 'normal'
@@ -86,9 +86,9 @@ Page({
   },
 
   // 更新字体标签
-  updateFontLabel() {
-    let label = '标准'
-    for (let i = 0; i < this.data.fontOptions.length; i++) {
+  updateFontLabel: function() {
+    var label = '标准'
+    for (var i = 0; i < this.data.fontOptions.length; i++) {
       if (this.data.fontOptions[i].value === this.data.fontSize) {
         label = this.data.fontOptions[i].label
         break
@@ -98,11 +98,11 @@ Page({
   },
 
   // 计算缓存大小
-  calculateCache() {
+  calculateCache: function() {
     try {
-      const info = wx.getStorageInfoSync()
-      const size = info.currentSize
-      let sizeStr = ''
+      var info = wx.getStorageInfoSync()
+      var size = info.currentSize
+      var sizeStr = ''
       if (size < 1024) {
         sizeStr = size + 'KB'
       } else {
@@ -115,48 +115,49 @@ Page({
   },
 
   // 切换深色模式 - 带反馈
-  toggleDarkMode(e) {
+  toggleDarkMode: function(e) {
     feedback.buttonVisual('light')
-    const darkMode = e.detail.value
-    this.setData({ darkMode })
+    var darkMode = e.detail.value
+    this.setData({ darkMode: darkMode })
     
-    const settings = wx.getStorageSync('appSettings') || {}
+    var settings = wx.getStorageSync('appSettings') || {}
     settings.darkMode = darkMode
     wx.setStorageSync('appSettings', settings)
     
-    showToast(darkMode ? '已开启深色模式' : '已关闭深色模式')
+    util.showToast(darkMode ? '已开启深色模式' : '已关闭深色模式')
   },
 
   // 显示字体选择 - 带反馈
-  adjustFontSize() {
+  adjustFontSize: function() {
     feedback.buttonVisual('light')
     this.setData({ showFontModal: true })
   },
 
   // 隐藏字体选择
-  hideFontModal() {
+  hideFontModal: function() {
     this.setData({ showFontModal: false })
   },
 
-  stopPropagation() {},
+  stopPropagation: function() {},
 
   // 设置字体大小 - 带反馈
-  setFontSize(e) {
+  setFontSize: function(e) {
     feedback.buttonVisual('light')
-    const size = e.currentTarget.dataset.size
+    var size = e.currentTarget.dataset.size
     this.setData({ fontSize: size })
     this.updateFontLabel()
     
-    const settings = wx.getStorageSync('appSettings') || {}
+    var settings = wx.getStorageSync('appSettings') || {}
     settings.fontSize = size
     wx.setStorageSync('appSettings', settings)
     
     this.hideFontModal()
-    showToast('字体大小已调整')
+    util.showToast('字体大小已调整')
   },
 
   // 清理缓存 - 带二次确认
-  clearCache() {
+  clearCache: function() {
+    var that = this
     feedback.confirmAction({
       title: '清理缓存',
       content: '清理后需要重新登录，确定继续吗？',
@@ -164,23 +165,23 @@ Page({
       confirmColor: '#FF7D00',
       onConfirm: function() {
         wx.clearStorage()
-        feedback.showSuccess('缓存已清理', function() {
+        util.showToast('缓存已清理')
+        setTimeout(function() {
           wx.reLaunch({ url: '/pages/book/book' })
-        })
+        }, 500)
       }
     })
   },
 
-  // 清空所有数据 - 带二次确认和危险震动
-  clearAllData() {
-    const that = this
+  // 清空所有数据 - 带二次确认
+  clearAllData: function() {
+    var that = this
     
     feedback.confirmAction({
       title: '危险操作',
       content: '此操作将删除所有账单数据，且无法恢复！确定继续吗？',
       confirmText: '删除',
       confirmColor: '#F53F3F',
-      vibrateType: 'heavy',
       onConfirm: function() {
         // 二次确认
         feedback.confirmAction({
@@ -188,12 +189,10 @@ Page({
           content: '数据删除后无法找回，请谨慎操作',
           confirmText: '确认删除',
           confirmColor: '#F53F3F',
-          vibrateType: 'heavy',
           onConfirm: function() {
             expenseService.clearAll()
-            feedback.showSuccess('数据已清空', function() {
-              that.loadUserStats()
-            })
+            util.showToast('数据已清空')
+            that.loadUserStats()
           }
         })
       }
@@ -201,48 +200,48 @@ Page({
   },
 
   // 导航功能 - 带反馈
-  goToSecurity() {
+  goToSecurity: function() {
     feedback.buttonVisual('light')
-    showToast('安全中心开发中')
+    util.showToast('安全中心开发中')
   },
 
-  goToGoals() {
+  goToGoals: function() {
     feedback.buttonVisual('light')
-    showToast('存钱目标开发中')
+    wx.navigateTo({ url: '/pages/goal/goal' })
   },
 
-  goToBudget() {
+  goToBudget: function() {
     feedback.buttonVisual('light')
-    showToast('预算设置开发中')
+    wx.navigateTo({ url: '/pages/budget/budget' })
   },
 
-  goToCategories() {
+  goToCategories: function() {
     feedback.buttonVisual('light')
-    showToast('分类管理开发中')
+    util.showToast('分类管理开发中')
   },
 
-  backupData() {
+  backupData: function() {
     feedback.buttonVisual('light')
     wx.showActionSheet({
       itemList: ['导出为Excel', '导出为图片', '同步到云端'],
       success: function(res) {
-        const actions = ['导出Excel开发中', '导出图片开发中', '同步开发中']
-        showToast(actions[res.tapIndex])
+        var actions = ['导出Excel开发中', '导出图片开发中', '同步开发中']
+        util.showToast(actions[res.tapIndex])
       }
     })
   },
 
-  goToNotification() {
+  goToNotification: function() {
     feedback.buttonVisual('light')
-    showToast('通知设置开发中')
+    util.showToast('通知设置开发中')
   },
 
-  showHelp() {
+  showHelp: function() {
     feedback.buttonVisual('light')
     wx.navigateTo({ url: '/pages/help/help' })
   },
 
-  feedback() {
+  feedback: function() {
     feedback.buttonVisual('light')
     wx.showModal({
       title: '意见反馈',
@@ -250,27 +249,27 @@ Page({
       placeholderText: '请输入您的意见或建议...',
       success: function(res) {
         if (res.confirm && res.content) {
-          showToast('感谢您的反馈')
+          util.showToast('感谢您的反馈')
         }
       }
     })
   },
 
-  showAbout() {
+  showAbout: function() {
     feedback.buttonVisual('light')
     wx.showModal({
       title: '关于理财日记',
-      content: '理财日记 v1.0.0\n\n一款简洁高效的记账工具\n帮助您轻松管理日常收支\n\n© 2024 理财日记',
+      content: '理财日记 v1.0.0\n\n一款简洁高效的记账工具\n帮助您轻松管理日常收支\n\n 2024 理财日记',
       showCancel: false
     })
   },
 
-  showPrivacy() {
+  showPrivacy: function() {
     feedback.buttonVisual('light')
     wx.navigateTo({ url: '/pages/privacy/privacy' })
   },
 
-  showAgreement() {
+  showAgreement: function() {
     feedback.buttonVisual('light')
     wx.navigateTo({ url: '/pages/agreement/agreement' })
   }

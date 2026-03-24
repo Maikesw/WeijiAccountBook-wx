@@ -44,8 +44,8 @@ exports.main = async (event, context) => {
     // 构建数据（不清理字段，保留原始数据）
     const data = { ...expense }
     
-    // 删除 _id（让数据库自动生成）
-    delete data._id
+    // 保留本地 _id，确保数据一致性
+    // 删除 _openid 后重新设置（确保是当前用户的）
     delete data._openid
     
     // 设置时间
@@ -56,7 +56,11 @@ exports.main = async (event, context) => {
     console.log('准备插入:', JSON.stringify(data))
     
     try {
-      const result = await db.collection('expenses').add({
+      // 使用 _id 作为自定义 ID，实现幂等性（同一笔记录多次同步不会重复）
+      const docId = data._id
+      delete data._id
+      
+      const result = await db.collection('expenses').doc(docId).set({
         data: data
       })
       console.log('插入成功:', result)

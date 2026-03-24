@@ -240,9 +240,10 @@ Page({
   // 同步数据到云端
   syncToCloud() {
     wx.showLoading({ title: '正在同步...', mask: true })
-    
-    const expenses = expenseService.getLocalExpenses()
-    
+
+    // 使用 getAllLocalExpenses 获取完整数据（包含软删除标记的）
+    const expenses = expenseService.getAllLocalExpenses()
+
     if (expenses.length === 0) {
       wx.hideLoading()
       wx.showModal({
@@ -253,6 +254,9 @@ Page({
       return
     }
 
+    // 统计正常记录数量（不显示已删除的）
+    const activeCount = expenses.filter(item => !item.deletedAt).length
+
     wx.cloud.callFunction({
       name: 'syncExpenses',
       data: { expenses: expenses }
@@ -260,12 +264,12 @@ Page({
       wx.hideLoading()
       
       console.log('云函数返回:', res)
-      
+
       if (res.result && res.result.success) {
-        const syncedCount = res.result.syncedCount || expenses.length
+        // 显示正常记录数量，不包含已删除的
         wx.showModal({
           title: '同步成功',
-          content: `成功备份 ${syncedCount} 条账单数据到云端`,
+          content: `成功备份 ${activeCount} 条账单数据到云端`,
           showCancel: false,
           success: () => {
             const now = new Date().toLocaleString('zh-CN')
@@ -319,16 +323,20 @@ Page({
               return
             }
 
-            const localData = expenseService.getLocalExpenses()
+            const localData = expenseService.getAllLocalExpenses()
             const mergedData = this.mergeExpenses(localData, cloudData)
             
             expenseService.saveLocalExpenses(mergedData)
             
             this.loadUserStats()
-            
+
+            // 计算正常记录数量（过滤已删除的）
+            const cloudActiveCount = cloudData.filter(item => !item.deletedAt).length
+            const mergedActiveCount = mergedData.filter(item => !item.deletedAt).length
+
             wx.showModal({
               title: '恢复成功',
-              content: `从云端恢复 ${cloudData.length} 条数据\n合并后共 ${mergedData.length} 条账单`,
+              content: `从云端恢复 ${cloudActiveCount} 条数据\n合并后共 ${mergedActiveCount} 条账单`,
               showCancel: false
             })
           } else {
@@ -353,17 +361,48 @@ Page({
 
   // 合并本地和云端数据（去重）
   mergeExpenses(localData, cloudData) {
-    const merged = [...localData]
-    const localIds = new Set(localData.map(item => item._id))
-    
-    for (const cloudItem of cloudData) {
-      if (!localIds.has(cloudItem._id)) {
+    // 构建本地数据 Map
+    const localMap = new Map()
+    for (let i = 0; i < localData.length; i++) {
+      localMap.set(localData[i]._id, localData[i])
+    }
+
+    const merged = []
+    const processedIds = new Set()
+
+    // 处理云端数据
+    for (let i = 0; i < cloudData.length; i++) {
+      const cloudItem = cloudData[i]
+      const localItem = localMap.get(cloudItem._id)
+
+      if (localItem) {
+        // 两边都有，比较 updatedAt 取最新
+        const cloudTime = new Date(cloudItem.updatedAt).getTime()
+        const localTime = new Date(localItem.updatedAt).getTime()
+
+        if (cloudTime > localTime) {
+          merged.push(cloudItem)
+        } else {
+          merged.push(localItem)
+        }
+      } else {
+        // 云端有、本地没有，新增
         merged.push(cloudItem)
       }
+      processedIds.add(cloudItem._id)
     }
-    
+
+    // 处理本地独有的数据
+    for (let i = 0; i < localData.length; i++) {
+      const localItem = localData[i]
+      if (!processedIds.has(localItem._id)) {
+        merged.push(localItem)
+      }
+    }
+
+    // 按时间倒序排列
     merged.sort((a, b) => new Date(b.spentAt) - new Date(a.spentAt))
-    
+
     return merged
   },
 

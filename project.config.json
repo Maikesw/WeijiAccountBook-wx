@@ -45,7 +45,7 @@
     "disableSWC": true
   },
   "appid": "wxba87cf25ee45b2af",
-  "projectname": "quickstart-wx-cloud",
+  "projectname": "微记财本",
   "libVersion": "2.20.1",
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
   "condition": {

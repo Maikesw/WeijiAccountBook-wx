@@ -7,8 +7,14 @@
         <open-data type="userAvatarUrl"></open-data>
       </view>
       <view class="user-info">
-        <open-data type="userNickName" class="user-name"></open-data>
-        <text class="user-id" wx:if="{{userInfo.openid}}">ID: {{userInfo.openid}}</text>
+        <block wx:if="{{isLogin}}">
+          <open-data type="userNickName" class="user-name"></open-data>
+          <text class="user-id" wx:if="{{openid}}">ID: {{openid}}</text>
+        </block>
+        <block wx:else>
+          <text class="user-name">未登录</text>
+          <text class="user-id">登录后可同步数据</text>
+        </block>
       </view>
     </view>
     
@@ -26,6 +32,22 @@
       <view class="stat-item">
         <text class="stat-value">{{userStats.totalStories}}</text>
         <text class="stat-label">财记数</text>
+      </view>
+    </view>
+
+    <!-- 登录/同步按钮 -->
+    <view class="sync-bar" wx:if="{{!isLogin}}">
+      <button class="btn-login" bindtap="onLogin">微信一键登录</button>
+    </view>
+    <view class="sync-bar" wx:if="{{isLogin}}">
+      <view class="sync-btn" bindtap="syncToCloud">
+        <text>☁️</text>
+        <text>备份到云端</text>
+      </view>
+      <view class="sync-divider"></view>
+      <view class="sync-btn" bindtap="syncFromCloud">
+        <text>⬇️</text>
+        <text>从云端恢复</text>
       </view>
     </view>
   </view>
@@ -152,7 +174,7 @@
       <text class="divider">|</text>
       <text bindtap="showAgreement">用户协议</text>
     </text>
-    <text class="footer-copyright">© 2024 理财日记</text>
+    <text class="footer-copyright">© 2024 微记财本</text>
   </view>
 
   <!-- 底部安全区域 -->

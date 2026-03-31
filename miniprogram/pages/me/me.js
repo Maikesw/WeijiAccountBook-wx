@@ -7,6 +7,8 @@ Page({
   data: {
     // 用户信息
     userInfo: {},
+    isLogin: false,
+    openid: '',
     
     // 用户统计
     userStats: {
@@ -28,10 +30,14 @@ Page({
       { value: 'normal', label: '标准', previewSize: 32 },
       { value: 'large', label: '大', previewSize: 38 },
       { value: 'xlarge', label: '超大', previewSize: 44 }
-    ]
+    ],
+
+    // 同步状态
+    syncing: false
   },
 
   onLoad: function() {
+    this.checkLoginStatus()
     this.loadUserInfo()
     this.loadUserStats()
     this.loadSettings()
@@ -39,7 +45,116 @@ Page({
   },
 
   onShow: function() {
+    this.checkLoginStatus()
     this.loadUserStats()
+  },
+
+  // 检查登录状态
+  checkLoginStatus: function() {
+    var app = getApp()
+    var openid = wx.getStorageSync('openid')
+    this.setData({
+      isLogin: !!(app.globalData.isLogin || openid),
+      openid: app.globalData.openid || openid || ''
+    })
+  },
+
+  // 微信登录
+  onLogin: function() {
+    var that = this
+    feedback.showLoading('登录中...')
+    var app = getApp()
+    
+    wx.cloud.callFunction({
+      name: 'login',
+      success: function(res) {
+        feedback.hideLoading()
+        if (res.result && res.result.success) {
+          var openid = res.result.openid
+          app.globalData.openid = openid
+          app.globalData.isLogin = true
+          wx.setStorageSync('openid', openid)
+          that.setData({ isLogin: true, openid: openid })
+          util.showToast('登录成功')
+
+          // 老用户自动拉取云端数据
+          if (!res.result.isNewUser) {
+            that.syncFromCloud()
+          }
+        } else {
+          util.showToast('登录失败')
+        }
+      },
+      fail: function(err) {
+        feedback.hideLoading()
+        console.error('登录失败:', err)
+        util.showToast('登录失败')
+      }
+    })
+  },
+
+  // 同步数据到云端
+  syncToCloud: function() {
+    var that = this
+    if (!this.data.isLogin) {
+      util.showToast('请先登录')
+      return
+    }
+
+    feedback.confirmAction({
+      title: '同步到云端',
+      content: '将本地数据备份到云端，是否继续？',
+      confirmText: '同步',
+      onConfirm: function() {
+        that.setData({ syncing: true })
+        feedback.showLoading('同步中...')
+        var app = getApp()
+        app.syncToCloud(function(result) {
+          feedback.hideLoading()
+          that.setData({ syncing: false })
+          if (result.success) {
+            feedback.showSuccess('同步成功')
+          } else {
+            feedback.showError('同步失败')
+          }
+        })
+      }
+    })
+  },
+
+  // 从云端恢复数据
+  syncFromCloud: function() {
+    var that = this
+    if (!this.data.isLogin) {
+      util.showToast('请先登录')
+      return
+    }
+
+    feedback.confirmAction({
+      title: '从云端恢复',
+      content: '云端数据将覆盖本地数据，是否继续？',
+      confirmText: '恢复',
+      onConfirm: function() {
+        that.setData({ syncing: true })
+        feedback.showLoading('恢复中...')
+        var app = getApp()
+        app.syncFromCloud(function(result) {
+          feedback.hideLoading()
+          that.setData({ syncing: false })
+          if (result.success) {
+            that.loadUserStats()
+            that.loadSettings()
+            if (result.hasData) {
+              feedback.showSuccess('恢复成功')
+            } else {
+              util.showToast('云端暂无数据')
+            }
+          } else {
+            feedback.showError('恢复失败')
+          }
+        })
+      }
+    })
   },
 
   // 加载用户信息
@@ -258,8 +373,8 @@ Page({
   showAbout: function() {
     feedback.buttonVisual('light')
     wx.showModal({
-      title: '关于理财日记',
-      content: '理财日记 v1.0.0\n\n一款简洁高效的记账工具\n帮助您轻松管理日常收支\n\n 2024 理财日记',
+      title: '关于微记财本',
+      content: '微记财本 v1.0.0\n\n一款简洁高效的记账工具\n帮助您轻松管理日常收支\n\n 2024 微记财本',
       showCancel: false
     })
   },

@@ -5,6 +5,21 @@
 
 var STORAGE_KEY = 'racoon_budgets'
 
+function delaySyncToCloud() {
+  var app = getApp()
+  if (app && app.syncToCloud) {
+    // 使用全局定时器避免频繁同步
+    if (app._budgetSyncTimer) clearTimeout(app._budgetSyncTimer)
+    app._budgetSyncTimer = setTimeout(function() {
+      app.syncToCloud(function(result) {
+        if (result.success) {
+          console.log('budgetService 自动同步成功')
+        }
+      })
+    }, 3000)
+  }
+}
+
 module.exports = {
   // 获取月度预算
   getMonthBudgets: function(year, month) {
@@ -24,6 +39,7 @@ module.exports = {
     
     allBudgets[key][data.category] = data.amount
     wx.setStorageSync(STORAGE_KEY, allBudgets)
+    delaySyncToCloud()
     return true
   },
 
@@ -35,6 +51,7 @@ module.exports = {
     if (allBudgets[key]) {
       delete allBudgets[key][category]
       wx.setStorageSync(STORAGE_KEY, allBudgets)
+      delaySyncToCloud()
     }
     return true
   },

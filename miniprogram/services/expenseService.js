@@ -6,6 +6,25 @@ var focusCollection = db.collection('focus')
 function ExpenseService() {
   this.EXPENSES_KEY = 'expenses'
   this.FOCUS_KEY = 'focusList'
+  this.autoSync = true
+  this.syncTimer = null
+}
+
+// 延迟自动同步到云端
+ExpenseService.prototype.delaySyncToCloud = function() {
+  if (!this.autoSync) return
+  var that = this
+  if (this.syncTimer) clearTimeout(this.syncTimer)
+  this.syncTimer = setTimeout(function() {
+    var app = getApp()
+    if (app && app.syncToCloud) {
+      app.syncToCloud(function(result) {
+        if (result.success) {
+          console.log('expenseService 自动同步成功')
+        }
+      })
+    }
+  }, 3000)
 }
 
 // ========== 本地存储操作 ==========
@@ -78,6 +97,7 @@ ExpenseService.prototype.createExpense = function(expenseData) {
     }
     expenses.unshift(newExpense)
     that.saveLocalExpenses(expenses)
+    that.delaySyncToCloud()
     resolve(newExpense)
   })
 }
@@ -106,6 +126,7 @@ ExpenseService.prototype.updateExpense = function(id, updateData) {
     }
     expenses[index].updatedAt = new Date().toISOString()
     that.saveLocalExpenses(expenses)
+    that.delaySyncToCloud()
     resolve(expenses[index])
   })
 }
@@ -128,6 +149,7 @@ ExpenseService.prototype.deleteExpense = function(id) {
     }
     expenses.splice(index, 1)
     that.saveLocalExpenses(expenses)
+    that.delaySyncToCloud()
     resolve(true)
   })
 }
@@ -152,6 +174,7 @@ ExpenseService.prototype.addFocus = function(name) {
   if (!found) {
     focusList.push(name)
     wx.setStorageSync(this.FOCUS_KEY, focusList)
+    this.delaySyncToCloud()
   }
   return focusList
 }
@@ -169,6 +192,7 @@ ExpenseService.prototype.removeFocus = function(name) {
   if (index > -1) {
     focusList.splice(index, 1)
     wx.setStorageSync(this.FOCUS_KEY, focusList)
+    this.delaySyncToCloud()
   }
   return focusList
 }
@@ -195,6 +219,7 @@ ExpenseService.prototype.updateFocus = function(oldName, newName) {
       }
     }
     this.saveLocalExpenses(expenses)
+    this.delaySyncToCloud()
   }
   return focusList
 }
@@ -305,6 +330,7 @@ ExpenseService.prototype.generateId = function() {
 ExpenseService.prototype.clearAll = function() {
   wx.removeStorageSync(this.EXPENSES_KEY)
   wx.removeStorageSync(this.FOCUS_KEY)
+  this.delaySyncToCloud()
 }
 
 module.exports = new ExpenseService()

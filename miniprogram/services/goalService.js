@@ -6,6 +6,20 @@
 var STORAGE_KEY = 'racoon_goals'
 var RECORDS_KEY = 'racoon_goal_records'
 
+function delaySyncToCloud() {
+  var app = getApp()
+  if (app && app.syncToCloud) {
+    if (app._goalSyncTimer) clearTimeout(app._goalSyncTimer)
+    app._goalSyncTimer = setTimeout(function() {
+      app.syncToCloud(function(result) {
+        if (result.success) {
+          console.log('goalService 自动同步成功')
+        }
+      })
+    }, 3000)
+  }
+}
+
 module.exports = {
   // 获取所有目标
   getGoals: function() {
@@ -39,6 +53,7 @@ module.exports = {
     }
     goals.push(newGoal)
     wx.setStorageSync(STORAGE_KEY, goals)
+    delaySyncToCloud()
     return newGoal
   },
 
@@ -54,6 +69,7 @@ module.exports = {
         }
         goals[i].updatedAt = new Date().toISOString()
         wx.setStorageSync(STORAGE_KEY, goals)
+        delaySyncToCloud()
         return goals[i]
       }
     }
@@ -70,6 +86,7 @@ module.exports = {
       }
     }
     wx.setStorageSync(STORAGE_KEY, filtered)
+    delaySyncToCloud()
     // 同时删除记录
     this.deleteRecords(id)
     return true
@@ -96,7 +113,7 @@ module.exports = {
       timestamp: Date.now()
     })
     wx.setStorageSync(RECORDS_KEY, records)
-    
+    delaySyncToCloud()
     return true
   },
 
@@ -126,6 +143,7 @@ module.exports = {
     var records = wx.getStorageSync(RECORDS_KEY) || {}
     delete records[goalId]
     wx.setStorageSync(RECORDS_KEY, records)
+    delaySyncToCloud()
   },
 
   // 获取统计数据
